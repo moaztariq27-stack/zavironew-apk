@@ -1,0 +1,14 @@
+{
+  "name": "zaviro-web-pwa",
+  "version": "1.0.0",
+  "description": "ZAVIRO - GHAR SE GHAR TAK. Full-Stack Responsive Web App & Installable PWA for Android Chrome and iPhone Safari.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'Static and Node.js Cloud Run bundle ready'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

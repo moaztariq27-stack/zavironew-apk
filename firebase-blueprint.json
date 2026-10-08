@@ -1,0 +1,406 @@
+{
+  "entities": {
+    "CustomerProfile": {
+      "title": "CustomerProfile",
+      "description": "Authenticated customer profile and delivery preferences. Clients must submit FieldValue.serverTimestamp() for createdAt and updatedAt.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Authenticated Firebase user UID owning this profile."
+        },
+        "name": {
+          "type": "string",
+          "description": "Customer full name."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Customer phone number."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Customer email address."
+        },
+        "address": {
+          "type": "string",
+          "description": "Default delivery address."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Default delivery instructions."
+        },
+        "profileImageUrl": {
+          "type": "string",
+          "description": "Avatar URL or portable data URI."
+        },
+        "authProvider": {
+          "type": "string",
+          "enum": ["google", "phone", ""],
+          "description": "Authentication provider identifier."
+        },
+        "isAuthenticated": {
+          "type": "boolean",
+          "description": "Whether the customer profile is authenticated."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": ["uid", "name", "createdAt", "updatedAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer food delivery order. Clients must submit FieldValue.serverTimestamp() for createdAt and updatedAt.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique order document ID."
+        },
+        "orderNumber": {
+          "type": "string",
+          "description": "Human-readable order code (e.g., #ZAV-1234)."
+        },
+        "customerUid": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the customer who placed the order."
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Customer full name for delivery."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Customer contact phone number."
+        },
+        "customerEmail": {
+          "type": "string",
+          "description": "Customer contact email."
+        },
+        "deliveryAddress": {
+          "type": "string",
+          "description": "Full delivery street address."
+        },
+        "orderNotes": {
+          "type": "string",
+          "description": "Special delivery or kitchen instructions."
+        },
+        "subtotal": {
+          "type": "integer",
+          "description": "Order items subtotal in PKR."
+        },
+        "deliveryFee": {
+          "type": "integer",
+          "description": "Delivery fee in PKR."
+        },
+        "total": {
+          "type": "integer",
+          "description": "Grand total in PKR."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["RECEIVED", "PREPARING", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"],
+          "description": "Current order fulfillment status."
+        },
+        "paymentMethod": {
+          "type": "string",
+          "description": "Selected payment method."
+        },
+        "items": {
+          "type": "array",
+          "description": "Bounded list of ordered line items (max 50)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when order was placed (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when order was last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "id",
+        "orderNumber",
+        "customerUid",
+        "customerName",
+        "phone",
+        "deliveryAddress",
+        "subtotal",
+        "deliveryFee",
+        "total",
+        "status",
+        "paymentMethod",
+        "items",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Menu food item managed by admins and readable by customers.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique product ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Product display name."
+        },
+        "category": {
+          "type": "string",
+          "description": "Menu category name."
+        },
+        "description": {
+          "type": "string",
+          "description": "Product description."
+        },
+        "ingredients": {
+          "type": "string",
+          "description": "Comma-separated ingredients summary."
+        },
+        "price": {
+          "type": "integer",
+          "description": "Unit price in PKR."
+        },
+        "isAvailable": {
+          "type": "boolean",
+          "description": "Whether item is currently in stock."
+        },
+        "isPopular": {
+          "type": "boolean",
+          "description": "Whether item is featured on home screen."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Cloud URL or data URI for product image."
+        },
+        "isDeleted": {
+          "type": "boolean",
+          "description": "Soft-delete tombstone flag."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last modification (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": ["id", "name", "category", "price", "isAvailable", "isDeleted", "updatedAt"]
+    },
+    "Deal": {
+      "title": "Deal",
+      "description": "Value combo deal managed by admins and readable by customers.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique deal ID."
+        },
+        "dealNumber": {
+          "type": "integer",
+          "description": "Deal sequence number."
+        },
+        "name": {
+          "type": "string",
+          "description": "Deal title."
+        },
+        "category": {
+          "type": "string",
+          "description": "Deal category."
+        },
+        "items": {
+          "type": "array",
+          "description": "Bounded list of included item strings."
+        },
+        "description": {
+          "type": "string",
+          "description": "Deal description."
+        },
+        "price": {
+          "type": "integer",
+          "description": "Discounted deal price in PKR."
+        },
+        "originalPrice": {
+          "type": "integer",
+          "description": "Original regular price in PKR."
+        },
+        "saveAmount": {
+          "type": "integer",
+          "description": "Savings amount in PKR."
+        },
+        "isAvailable": {
+          "type": "boolean",
+          "description": "Whether deal is active."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Cloud URL or data URI for deal image."
+        },
+        "isDeleted": {
+          "type": "boolean",
+          "description": "Soft-delete tombstone flag."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last modification (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": ["id", "dealNumber", "name", "category", "items", "price", "isAvailable", "isDeleted", "updatedAt"]
+    },
+    "ExtraOption": {
+      "title": "ExtraOption",
+      "description": "Add-on extra topping or sauce option.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique extra ID."
+        },
+        "name": {
+          "type": "string",
+          "description": "Extra display name."
+        },
+        "price": {
+          "type": "integer",
+          "description": "Extra price in PKR."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description."
+        },
+        "isAvailable": {
+          "type": "boolean",
+          "description": "Whether extra is available."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Optional image URL or data URI."
+        },
+        "isDeleted": {
+          "type": "boolean",
+          "description": "Soft-delete tombstone flag."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last modification (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": ["id", "name", "price", "isAvailable", "isDeleted", "updatedAt"]
+    },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "General store settings, delivery fee, and branding configuration.",
+      "type": "object",
+      "properties": {
+        "deliveryFee": {
+          "type": "integer",
+          "description": "Delivery fee in PKR."
+        },
+        "minOrderAmount": {
+          "type": "integer",
+          "description": "Minimum order amount in PKR."
+        },
+        "isStoreOpen": {
+          "type": "boolean",
+          "description": "Whether store is accepting orders."
+        },
+        "announcement": {
+          "type": "string",
+          "description": "Store promotional banner text."
+        },
+        "whatsappNumber": {
+          "type": "string",
+          "description": "Store WhatsApp contact number."
+        },
+        "formattedWhatsappForUrl": {
+          "type": "string",
+          "description": "E.164 digits for wa.me links."
+        },
+        "instagramHandle": {
+          "type": "string",
+          "description": "Store Instagram handle."
+        },
+        "deliveryAreas": {
+          "type": "string",
+          "description": "Supported delivery areas."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last modification (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": ["updatedAt"]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Administrator registry entry keyed by Firebase Auth UID.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Admin Firebase Auth UID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Admin verified email."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when admin was registered."
+        }
+      },
+      "required": ["uid", "email", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/customers/{userId}": {
+      "schema": { "$ref": "#/entities/CustomerProfile" },
+      "description": "Per-user customer profile and delivery details isolated by userId."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/CustomerProfile" },
+      "description": "Per-user account document isolated by userId."
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders scoped by customerUid for customer access and manageable by admins."
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Storefront menu products; readable when isDeleted == false, writable only by admins."
+    },
+    "/deals/{dealId}": {
+      "schema": { "$ref": "#/entities/Deal" },
+      "description": "Storefront combo deals; readable when isDeleted == false, writable only by admins."
+    },
+    "/extras/{extraId}": {
+      "schema": { "$ref": "#/entities/ExtraOption" },
+      "description": "Storefront add-on extras; readable when isDeleted == false, writable only by admins."
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/StoreSettings" },
+      "description": "Storefront settings (general, branding, admin_security); writable only by admins."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Trusted admin UID registry."
+    }
+  }
+}

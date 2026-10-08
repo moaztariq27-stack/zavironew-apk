@@ -1,0 +1,52 @@
+{
+  "name": "ZAVIRO - GHAR SE GHAR TAK",
+  "short_name": "ZAVIRO",
+  "description": "ZAVIRO Food Ordering & Delivery Across Lahore - Pasta, Crispy Chicken, Wings, Wraps & 15 Value Deals.",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "categories": ["food", "shopping", "lifestyle"],
+  "lang": "en-PK",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "images/zaviro_logo.jpg?v=5",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/zaviro_logo.jpg?v=5",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Explore Menu",
+      "short_name": "Menu",
+      "description": "Browse Pasta, Crispy Chicken, Wings & Wraps",
+      "url": "./index.html?tab=menu",
+      "icons": [{ "src": "images/zaviro_logo.jpg?v=5", "sizes": "192x192" }]
+    },
+    {
+      "name": "15 Value Deals",
+      "short_name": "15 Deals",
+      "description": "Order from all 15 ZAVIRO value combos",
+      "url": "./index.html?tab=deals",
+      "icons": [{ "src": "images/zaviro_logo.jpg?v=5", "sizes": "192x192" }]
+    },
+    {
+      "name": "Track My Orders",
+      "short_name": "Orders",
+      "description": "Live order status tracking",
+      "url": "./index.html?tab=orders",
+      "icons": [{ "src": "images/zaviro_logo.jpg?v=5", "sizes": "192x192" }]
+    }
+  ]
+}

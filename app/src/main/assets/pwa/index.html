@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ZAVIRO" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="description" content="ZAVIRO - GHAR SE GHAR TAK. Order Hot & Fresh Pasta, Crispy Chicken, Wings, Wraps & 15 Value Deals across Lahore." />
+  <title>ZAVIRO — GHAR SE GHAR TAK</title>
+  <link rel="manifest" href="manifest.json" />
+  <link id="app-favicon" rel="icon" href="images/zaviro_logo.jpg?v=5" />
+  <link id="app-touch-icon" rel="apple-touch-icon" href="images/zaviro_logo.jpg?v=5" />
+  <style>
+    :root {
+      --zaviro-black: #0A0A0A;
+      --zaviro-surface: #141414;
+      --zaviro-card: #1C1C1C;
+      --zaviro-elevated: #252525;
+      --zaviro-border: #2E2E2E;
+      --zaviro-gold: #FFB800;
+      --zaviro-gold-light: #FFD54F;
+      --zaviro-gold-container: rgba(255, 184, 0, 0.14);
+      --zaviro-white: #FFFFFF;
+      --zaviro-text-sec: #CCCCCC;
+      --zaviro-text-muted: #8E8E93;
+      --zaviro-green: #00C853;
+      --zaviro-red: #FF3B30;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: var(--zaviro-black);
+      color: var(--zaviro-white);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      overscroll-behavior-y: none;
+      min-height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .app-shell {
+      max-width: 520px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      background: var(--zaviro-black);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 60px rgba(255, 184, 0, 0.08);
+      padding-top: var(--safe-top);
+      padding-bottom: calc(74px + var(--safe-bottom));
+    }
+
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--zaviro-black);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      transition: opacity 0.4s ease;
+    }
+    #splash-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .splash-logo {
+      width: 82%;
+      max-width: 300px;
+      max-height: 280px;
+      object-fit: contain;
+      animation: pulseScale 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .spinner {
+      margin-top: 32px;
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(255, 184, 0, 0.25);
+      border-top-color: var(--zaviro-gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulseScale {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 60px;
+      background: rgba(10, 10, 10, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--zaviro-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+    }
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .top-bar-logo {
+      height: 44px;
+      width: 58px;
+      object-fit: contain;
+    }
+    .top-bar-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--zaviro-white);
+    }
+    .top-bar-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .icon-btn {
+      background: var(--zaviro-card);
+      border: 1px solid var(--zaviro-border);
+      color: var(--zaviro-gold);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      font-size: 17px;
+    }
+    .cart-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--zaviro-gold);
+      color: #000;
+      font-size: 10px;
+      font-weight: 900;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+
+    .pwa-banner {
+      background: linear-gradient(90deg, #1E1705, #291F06);
+      border-bottom: 1px solid rgba(255, 184, 0, 0.4);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .pwa-banner-text {
+      font-size: 12px;
+      color: var(--zaviro-white);
+      line-height: 1.35;
+    }
+    .pwa-banner-text strong {
+      color: var(--zaviro-gold);
+      display: block;
+    }
+    .btn-gold-sm {
+      background: var(--zaviro-gold);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .hero-box {
+      position: relative;
+      height: 250px;
+      width: 100%;
+      overflow: hidden;
+      background: #050505;
+    }
+    .hero-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.35;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(10,10,10,0.97) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      text-align: center;
+    }
+    .hero-logo {
+      width: 74%;
+      max-width: 260px;
+      height: 158px;
+      object-fit: contain;
+    }
+    .hero-pill {
+      margin-top: 8px;
+      background: var(--zaviro-gold-container);
+      border: 1px solid rgba(255, 184, 0, 0.5);
+      color: var(--zaviro-gold-light);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .announcement-bar {
+      margin: 12px 14px 4px;
+      padding: 10px 12px;
+      background: var(--zaviro-card);
+      border: 1px solid rgba(255, 184, 0, 0.35);
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--zaviro-gold-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-wrap {
+      padding: 10px 14px;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--zaviro-card);
+      border: 1px solid var(--zaviro-border);
+      color: var(--zaviro-white);
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--zaviro-gold);
+    }
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 6px 14px 12px;
+      scrollbar-width: none;
+    }
+    .chip-row::-webkit-scrollbar { display: none; }
+    .chip {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--zaviro-card);
+      border: 1px solid var(--zaviro-border);
+      color: var(--zaviro-text-sec);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--zaviro-gold);
+      color: #000;
+      border-color: var(--zaviro-gold);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 14px 8px;
+    }
+    .section-title {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--zaviro-white);
+    }
+    .section-link {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--zaviro-gold);
+      cursor: pointer;
+    }
+
+    .cards-list {
+      padding: 0 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .food-card {
+      background: var(--zaviro-card);
+      border: 1px solid var(--zaviro-border);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      cursor: pointer;
+    }
+    .food-thumb {
+      width: 88px;
+      height: 88px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #101010;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 184, 0, 0.25);
+    }
+    .food-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .badge-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--zaviro-gold-container);
+      color: var(--zaviro-gold);
+    }
+    .badge-save {
+      background: rgba(0, 200, 83, 0.18);
+      color: #00E676;
+    }
+    .food-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--zaviro-white);
+      margin-bottom: 3px;
+    }
+    .food-desc {
+      font-size: 12px;
+      color: var(--zaviro-text-muted);
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .food-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .price-tag {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--zaviro-gold);
+    }
+    .old-price {
+      font-size: 11px;
+      color: var(--zaviro-text-muted);
+      text-decoration: line-through;
+      margin-left: 5px;
+      font-weight: 500;
+    }
+    .add-btn {
+      background: var(--zaviro-gold);
+      color: #000;
+      border: none;
+      border-radius: 9px;
+      padding: 7px 13px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 520px;
+      background: rgba(18, 18, 18, 0.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid var(--zaviro-border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 4px calc(8px + var(--safe-bottom));
+      z-index: 200;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: var(--zaviro-text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .nav-item.active {
+      color: var(--zaviro-gold);
+    }
+    .nav-icon {
+      font-size: 19px;
+    }
+
+    .whatsapp-fab {
+      position: fixed;
+      right: max(16px, calc(50% - 244px));
+      bottom: calc(84px + var(--safe-bottom));
+      background: #25D366;
+      color: #FFF;
+      border-radius: 999px;
+      padding: 10px 15px;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+      cursor: pointer;
+      z-index: 150;
+      text-decoration: none;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      z-index: 500;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-sheet {
+      width: 100%;
+      max-width: 520px;
+      max-height: 90dvh;
+      background: var(--zaviro-surface);
+      border-top: 1px solid var(--zaviro-gold);
+      border-radius: 22px 22px 0 0;
+      padding: 18px 16px calc(22px + var(--safe-bottom));
+      overflow-y: auto;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      color: var(--zaviro-text-muted);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .form-input, .form-textarea {
+      width: 100%;
+      background: var(--zaviro-card);
+      border: 1px solid var(--zaviro-border);
+      color: var(--zaviro-white);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    .form-input:focus, .form-textarea:focus {
+      border-color: var(--zaviro-gold);
+    }
+    .btn-primary {
+      width: 100%;
+      background: var(--zaviro-gold);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--zaviro-gold);
+      border: 1px solid var(--zaviro-gold);
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .subtab-row {
+      display: flex;
+      background: var(--zaviro-card);
+      border-bottom: 1px solid var(--zaviro-border);
+      overflow-x: auto;
+    }
+    .subtab {
+      flex: 1;
+      text-align: center;
+      padding: 12px 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--zaviro-text-muted);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .subtab.active {
+      color: var(--zaviro-gold);
+      border-bottom-color: var(--zaviro-gold);
+    }
+    .swatch-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .color-swatch {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--zaviro-border);
+    }
+    .color-swatch.selected {
+      border: 3px solid #FFF;
+      transform: scale(1.08);
+    }
+    .toast {
+      position: fixed;
+      bottom: 92px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--zaviro-gold);
+      color: #000;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      z-index: 2000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="splash-screen" onclick="hideSplash()">
+    <img id="splash-logo-img" class="splash-logo" alt="ZAVIRO Logo" />
+    <div class="spinner"></div>
+  </div>
+
+  <div class="app-shell">
+    <header class="top-bar">
+      <div class="top-bar-left" onclick="switchTab('home')">
+        <img id="topbar-logo-img" class="top-bar-logo" alt="ZAVIRO" />
+        <span id="topbar-title" class="top-bar-title"></span>
+      </div>
+      <div class="top-bar-actions">
+        <button class="icon-btn" title="Install / PWA Guide" onclick="openPwaModal()">📲</button>
+        <button class="icon-btn" title="Admin Portal" onclick="switchTab('admin')">⚙️</button>
+        <button class="icon-btn" title="Cart" onclick="switchTab('cart')">
+          🛒
+          <span id="cart-badge" class="cart-badge" style="display:none">0</span>
+        </button>
+      </div>
+    </header>
+
+    <div id="pwa-install-banner" class="pwa-banner">
+      <div class="pwa-banner-text">
+        <strong id="brand-banner-title">ZAVIRO — GHAR SE GHAR TAK</strong>
+        Install on Android or iPhone for a full-screen app experience
+      </div>
+      <button class="btn-gold-sm" onclick="triggerPwaInstall()">Install App</button>
+    </div>
+
+    <main id="main-content" style="flex:1"></main>
+
+    <a class="whatsapp-fab" href="https://wa.me/923044494742?text=Assalam-o-Alaikum%20ZAVIRO!%20I%20would%20like%20to%20place%20an%20order." target="_blank" rel="noopener">
+      💬 WhatsApp Order
+    </a>
+
+    <nav class="bottom-nav">
+      <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+        <span class="nav-icon">🏠</span>
+        <span>Home</span>
+      </div>
+      <div class="nav-item" data-tab="menu" onclick="switchTab('menu')">
+        <span class="nav-icon">🍝</span>
+        <span>Menu</span>
+      </div>
+      <div class="nav-item" data-tab="deals" onclick="switchTab('deals')">
+        <span class="nav-icon">🔥</span>
+        <span>15 Deals</span>
+      </div>
+      <div class="nav-item" data-tab="orders" onclick="switchTab('orders')">
+        <span class="nav-icon">🛵</span>
+        <span>Orders</span>
+      </div>
+      <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
+        <span class="nav-icon">👤</span>
+        <span>Profile</span>
+      </div>
+    </nav>
+  </div>
+
+  <div id="item-modal" class="modal-backdrop" onclick="if(event.target===this)closeItemModal()">
+    <div id="item-modal-content" class="modal-sheet"></div>
+  </div>
+
+  <div id="pwa-modal" class="modal-backdrop" onclick="if(event.target===this)closePwaModal()">
+    <div class="modal-sheet">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h3 style="color:var(--zaviro-gold);font-size:18px;font-weight:900">Install ZAVIRO Web App (PWA)</h3>
+        <button class="btn-outline" onclick="closePwaModal()">Close</button>
+      </div>
+      <p style="font-size:13px;color:var(--zaviro-text-sec);margin-bottom:14px">
+        ZAVIRO runs as a full-screen mobile app on both <strong>Android</strong> and <strong>iPhone (iOS)</strong> with live Firebase sync.
+      </p>
+      <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:14px;padding:14px;margin-bottom:12px">
+        <div style="color:var(--zaviro-gold);font-weight:800;font-size:14px;margin-bottom:6px">🤖 On Android (Chrome / Samsung Internet)</div>
+        <ol style="font-size:12px;color:var(--zaviro-text-sec);padding-left:18px;line-height:1.6">
+          <li>Tap the <strong>"Install App"</strong> button on the top banner, or open browser menu (⋮).</li>
+          <li>Select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</li>
+          <li>Launch <strong>ZAVIRO</strong> from your home screen in full-screen standalone mode!</li>
+        </ol>
+      </div>
+      <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:14px;padding:14px">
+        <div style="color:var(--zaviro-gold);font-weight:800;font-size:14px;margin-bottom:6px">🍎 On iPhone / iPad (iOS Safari)</div>
+        <ol style="font-size:12px;color:var(--zaviro-text-sec);padding-left:18px;line-height:1.6">
+          <li>Open ZAVIRO in <strong>Safari</strong> on your iPhone.</li>
+          <li>Tap the <strong>Share</strong> icon (square with arrow pointing up ⬆️) at the bottom bar.</li>
+          <li>Scroll down and tap <strong>"Add to Home Screen"</strong>, then tap <strong>"Add"</strong>.</li>
+          <li>Open ZAVIRO from your iPhone Home Screen for a native full-screen experience!</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const ASSET_MAP = {
+      logo: ['file:///android_res/drawable/zaviro_logo.jpg', 'images/zaviro_logo.jpg?v=5'],
+      hero: ['file:///android_res/drawable/zaviro_hero_banner.jpg', 'images/zaviro_hero_banner.jpg'],
+      pasta: ['file:///android_res/drawable/zaviro_creamy_pasta.jpg', 'images/zaviro_creamy_pasta.jpg'],
+      wrap: ['file:///android_res/drawable/zaviro_wrap.jpg', 'images/zaviro_wrap.jpg'],
+      chicken: ['file:///android_res/drawable/zaviro_crispy_chicken.jpg', 'images/zaviro_crispy_chicken.jpg'],
+      wings: ['file:///android_res/drawable/zaviro_wings.jpg', 'images/zaviro_wings.jpg'],
+      fries: ['file:///android_res/drawable/zaviro_loaded_fries.jpg', 'images/zaviro_loaded_fries.jpg']
+    };
+
+    function getAssetUrl(key) {
+      if (window.__ZAVIRO_ASSETS__ && window.__ZAVIRO_ASSETS__[key]) {
+        return window.__ZAVIRO_ASSETS__[key];
+      }
+      const list = ASSET_MAP[key] || ASSET_MAP.logo;
+      return window.location.protocol === 'file:' ? list[0] : list[1];
+    }
+
+    function handleImgError(imgEl, key) {
+      const list = ASSET_MAP[key] || ASSET_MAP.logo;
+      if (imgEl.dataset.fallbackTried !== '1') {
+        imgEl.dataset.fallbackTried = '1';
+        imgEl.src = list[0];
+      }
+    }
+
+    const STANDARD_EXTRAS = [
+      { id: 'extra_cheese', name: 'Add Extra Cheese', price: 80 },
+      { id: 'garlic_sauce', name: 'Signature Garlic Sauce', price: 80 },
+      { id: 'drink_345ml', name: 'Soft Drink 345ml', price: 80 },
+      { id: 'regular_fries', name: 'Regular Fries Portion', price: 149 }
+    ];
+
+    const CATEGORIES = ['All', 'Pasta', 'Crispy Chicken', 'Wings', 'Wraps & Rolls', 'Fries', 'Drinks', 'Extras'];
+    const DEAL_CATEGORIES = ['All', 'Wraps & Rolls', 'Pasta Combos', 'Crispy Chicken', 'Wings Specials', 'Family Deals', 'Special Value'];
+
+    const INITIAL_PRODUCTS = [
+      { id: 'prod_chicken_spaghetti', name: 'Chicken Spaghetti', category: 'Pasta', description: 'Tender shredded chicken, rich Italian-style tomato herb spaghetti, topped with chilli flakes and aromatic seasoning.', price: 399, isAvailable: true, isPopular: true, imgKey: 'pasta' },
+      { id: 'prod_creamy_chicken_pasta', name: 'Creamy Chicken Pasta', category: 'Pasta', description: 'Penne pasta smothered in rich velvet white cream sauce, tender chicken cubes, and freshly crushed herbs.', price: 449, isAvailable: true, isPopular: true, imgKey: 'pasta' },
+      { id: 'prod_spicy_chicken_pasta', name: 'Spicy Chicken Pasta', category: 'Pasta', description: 'Spicy infused red & white sauce penne pasta loaded with fiery chicken pieces and crushed peppers.', price: 449, isAvailable: true, isPopular: false, imgKey: 'pasta' },
+      { id: 'prod_chicken_wrap_roll', name: 'Chicken Wrap & Roll', category: 'Wraps & Rolls', description: 'Juicy flame-grilled chicken chunks wrapped in warm soft tortilla with house garlic mayo and crisp onions.', price: 299, isAvailable: true, isPopular: true, imgKey: 'wrap' },
+      { id: 'prod_zinger_wrap_roll', name: 'Zinger Wrap & Roll', category: 'Wraps & Rolls', description: 'Ultra-crispy golden zinger fillet strips rolled in fresh tortilla with secret signature sauce.', price: 349, isAvailable: true, isPopular: true, imgKey: 'wrap' },
+      { id: 'prod_cheese_chicken_wrap_roll', name: 'Cheese Chicken Wrap & Roll', category: 'Wraps & Rolls', description: 'Tender seasoned chicken with generous melted cheese slice and garlic sauce rolled in toasted wrap.', price: 349, isAvailable: true, isPopular: false, imgKey: 'wrap' },
+      { id: 'prod_cheese_zinger_wrap_roll', name: 'Cheese Zinger Wrap & Roll', category: 'Wraps & Rolls', description: 'Golden crispy zinger chicken loaded with melted cheddar cheese slice and spicy garlic dressing.', price: 399, isAvailable: true, isPopular: true, imgKey: 'wrap' },
+      { id: 'prod_zinger_piece', name: 'Zinger Piece', category: 'Crispy Chicken', description: 'Signature hand-breaded spicy zinger chicken piece fried to golden perfection with bold seasoning.', price: 299, isAvailable: true, isPopular: false, imgKey: 'chicken' },
+      { id: 'prod_crispy_chicken_piece', name: 'Crispy Chicken Piece', category: 'Crispy Chicken', description: 'Classic crunchy outside, juicy inside fried chicken piece seasoned with Zaviro special spice blend.', price: 299, isAvailable: true, isPopular: false, imgKey: 'chicken' },
+      { id: 'prod_2_piece_combo', name: '2-Piece Combo', category: 'Crispy Chicken', description: '2 golden crispy chicken pieces served with crunchy fries and dipping sauce.', price: 549, isAvailable: true, isPopular: true, imgKey: 'chicken' },
+      { id: 'prod_3_piece_combo', name: '3-Piece Combo', category: 'Crispy Chicken', description: '3 big juicy crispy chicken pieces served with golden fries and garlic dip.', price: 799, isAvailable: true, isPopular: false, imgKey: 'chicken' },
+      { id: 'prod_6_piece_wings', name: '6-Piece Wings', category: 'Wings', description: '6 succulent chicken wings tossed in smoky BBQ glaze, sprinkled with sesame seeds. Crispy, juicy, irresistible.', price: 699, isAvailable: true, isPopular: true, imgKey: 'wings' },
+      { id: 'prod_12_piece_wings', name: '12-Piece Wings', category: 'Wings', description: '12 large succulent wings with irresistible smoky flavour and bigger bites for true wings lovers.', price: 1299, isAvailable: true, isPopular: false, imgKey: 'wings' },
+      { id: 'prod_regular_fries', name: 'Regular Fries', category: 'Fries', description: 'Crispy golden salted potato fries, hot and crunchy.', price: 149, isAvailable: true, isPopular: false, imgKey: 'fries' },
+      { id: 'prod_masala_fries', name: 'Masala Fries', category: 'Fries', description: 'Crispy fries dusted with special chatpata Pakistani masala spice blend.', price: 199, isAvailable: true, isPopular: true, imgKey: 'fries' },
+      { id: 'prod_cheese_fries', name: 'Cheese Fries', category: 'Fries', description: 'Golden fries smothered in hot creamy liquid cheese sauce.', price: 249, isAvailable: true, isPopular: false, imgKey: 'fries' },
+      { id: 'prod_loaded_fries_regular', name: 'Loaded Fries Regular', category: 'Fries', description: 'Cheesy, crunchy, full of flavour! Crispy fries loaded with cheese sauce, crispy fried chicken chunks, and signature sauces.', price: 499, isAvailable: true, isPopular: true, imgKey: 'fries' },
+      { id: 'prod_loaded_fries_large', name: 'Loaded Fries Large', category: 'Fries', description: 'Large sharing platter of loaded fries drenched in double cheese sauce and crispy chicken bites.', price: 599, isAvailable: true, isPopular: false, imgKey: 'fries' },
+      { id: 'prod_soft_drink_345ml', name: 'Soft Drink 345ml', category: 'Drinks', description: 'Chilled 345ml beverage bottle (Pepsi / 7Up / Mirinda / Mountain Dew).', price: 80, isAvailable: true, isPopular: false, imgKey: 'hero' },
+      { id: 'prod_soft_drink_1_5l', name: 'Soft Drink 1.5L', category: 'Drinks', description: 'Chilled 1.5 Litre jumbo bottle for family meals.', price: 220, isAvailable: true, isPopular: false, imgKey: 'hero' },
+      { id: 'prod_garlic_sauce', name: 'Garlic Sauce', category: 'Extras', description: 'ZAVIRO special homemade velvety garlic dip.', price: 80, isAvailable: true, isPopular: false, imgKey: 'wrap' },
+      { id: 'prod_extra_cheese', name: 'Extra Cheese', category: 'Extras', description: 'Rich melted cheese topping portion.', price: 80, isAvailable: true, isPopular: false, imgKey: 'fries' }
+    ];
+
+    const INITIAL_DEALS = [
+      { id: 'deal_1', dealNumber: 1, name: 'ZAVIRO QUICK BITE', category: 'Wraps & Rolls', items: ['Chicken Wrap & Roll', 'Regular Fries', '345ml Drink'], price: 499, originalPrice: 528, saveAmount: 29, isAvailable: true, imgKey: 'wrap' },
+      { id: 'deal_2', dealNumber: 2, name: 'CHICKEN STREET BOX', category: 'Wraps & Rolls', items: ['Chicken Wrap & Roll', 'Masala Fries', '345ml Drink'], price: 549, originalPrice: 578, saveAmount: 29, isAvailable: true, imgKey: 'wrap' },
+      { id: 'deal_3', dealNumber: 3, name: 'CHEESY CHICKEN BOX', category: 'Wraps & Rolls', items: ['Cheese Chicken Wrap & Roll', 'Regular Fries', '345ml Drink'], price: 549, originalPrice: 578, saveAmount: 29, isAvailable: true, imgKey: 'wrap' },
+      { id: 'deal_4', dealNumber: 4, name: 'CREAMY PASTA COMBO', category: 'Pasta Combos', items: ['Creamy Chicken Pasta', 'Regular Fries', '345ml Drink'], price: 629, originalPrice: 678, saveAmount: 49, isAvailable: true, imgKey: 'pasta' },
+      { id: 'deal_5', dealNumber: 5, name: 'SPICY PASTA FEAST', category: 'Pasta Combos', items: ['Spicy Chicken Pasta', 'Masala Fries', '345ml Drink'], price: 679, originalPrice: 728, saveAmount: 49, isAvailable: true, imgKey: 'pasta' },
+      { id: 'deal_6', dealNumber: 6, name: 'PASTA & ROLL DUO', category: 'Pasta Combos', items: ['Chicken Spaghetti', 'Chicken Wrap & Roll', '345ml Drink'], price: 729, originalPrice: 778, saveAmount: 49, isAvailable: true, imgKey: 'pasta' },
+      { id: 'deal_7', dealNumber: 7, name: 'CRISPY CHICKEN BOX', category: 'Crispy Chicken', items: ['2 Crispy Chicken Pieces', 'Regular Fries', '345ml Drink'], price: 729, originalPrice: 827, saveAmount: 98, isAvailable: true, imgKey: 'chicken' },
+      { id: 'deal_8', dealNumber: 8, name: 'DOUBLE CRUNCH BOX', category: 'Crispy Chicken', items: ['2 Crispy Chicken Pieces', 'Masala Fries', '345ml Drink'], price: 749, originalPrice: 877, saveAmount: 128, isAvailable: true, imgKey: 'chicken' },
+      { id: 'deal_9', dealNumber: 9, name: 'WINGS & CRUNCH', category: 'Wings Specials', items: ['6-Piece Wings', 'Regular Fries', '345ml Drink'], price: 849, originalPrice: 928, saveAmount: 79, isAvailable: true, imgKey: 'wings' },
+      { id: 'deal_10', dealNumber: 10, name: 'WINGS MASALA FEAST', category: 'Wings Specials', items: ['6-Piece Wings', 'Masala Fries', '345ml Drink'], price: 899, originalPrice: 978, saveAmount: 79, isAvailable: true, imgKey: 'wings' },
+      { id: 'deal_11', dealNumber: 11, name: 'LOADED WINGS BOX', category: 'Wings Specials', items: ['6-Piece Wings', 'Loaded Fries Regular', '345ml Drink'], price: 1099, originalPrice: 1278, saveAmount: 179, isAvailable: true, imgKey: 'wings' },
+      { id: 'deal_12', dealNumber: 12, name: 'DOUBLE WINGS FEAST', category: 'Wings Specials', items: ['12-Piece Wings', '1.5L Drink'], price: 1399, originalPrice: 1519, saveAmount: 120, isAvailable: true, imgKey: 'wings' },
+      { id: 'deal_13', dealNumber: 13, name: 'ZAVIRO FAMILY FEAST', category: 'Family Deals', items: ['2 Chicken Wraps & Rolls', '2 Crispy Chicken Pieces', 'Large Fries', '1.5L Drink'], price: 1899, originalPrice: 2015, saveAmount: 116, isAvailable: true, imgKey: 'hero' },
+      { id: 'deal_14', dealNumber: 14, name: 'ZAVIRO ULTIMATE FAMILY', category: 'Family Deals', items: ['4 Chicken Wraps & Rolls', '4 Crispy Chicken Pieces', 'Large Fries', '1.5L Drink'], price: 2599, originalPrice: 3211, saveAmount: 612, isAvailable: true, imgKey: 'hero' },
+      { id: 'deal_15', dealNumber: 15, name: 'ZAVIRO MEGA BOX', category: 'Special Value', items: ['Chicken Wrap & Roll', 'Loaded Fries Regular', '345ml Drink'], price: 849, originalPrice: 878, saveAmount: 29, isAvailable: true, imgKey: 'fries' }
+    ];
+
+    const FIREBASE_PROJECT_ID = 'gen-lang-client-0737867339';
+    const FIRESTORE_DB_ID = 'ai-studio-android-zaviro-1f2b530c-27d2-4998-87ff-db0d86e65d19';
+    const FIRESTORE_BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/${FIRESTORE_DB_ID}/documents`;
+
+    const state = {
+      currentTab: 'home',
+      searchQuery: '',
+      selectedCategory: 'All',
+      selectedDealCategory: 'All',
+      products: JSON.parse(localStorage.getItem('zaviro_products')) || INITIAL_PRODUCTS,
+      deals: JSON.parse(localStorage.getItem('zaviro_deals')) || INITIAL_DEALS,
+      cart: JSON.parse(localStorage.getItem('zaviro_cart')) || [],
+      orders: JSON.parse(localStorage.getItem('zaviro_orders')) || [],
+      settings: JSON.parse(localStorage.getItem('zaviro_settings')) || {
+        deliveryFee: 150,
+        announcement: 'Welcome to ZAVIRO - GHAR SE GHAR TAK! Serving Hot & Fresh Across Lahore.',
+        whatsappNumber: '0304-4494742'
+      },
+      branding: JSON.parse(localStorage.getItem('zaviro_branding')) || {
+        brandName: 'ZAVIRO',
+        tagline: 'GHAR SE GHAR TAK',
+        primaryColorHex: '#FFB800',
+        secondaryColorHex: '#FFD54F',
+        masterLogoUrl: '',
+        splashLogoUrl: '',
+        homeHeaderLogoUrl: '',
+        loginLogoUrl: '',
+        adminLogoUrl: ''
+      },
+      customer: JSON.parse(localStorage.getItem('zaviro_customer')) || {
+        name: 'Ali Khan',
+        phone: '0300-1234567',
+        address: 'House 14-B, Street 3, Block H, Gulberg III, Lahore',
+        notes: '',
+        profileImageUrl: ''
+      },
+      isAdminLoggedIn: localStorage.getItem('zaviro_admin_logged_in') === 'true',
+      adminSubTab: 'orders',
+      settingsSubTab: 'branding',
+      selectedBrandingSlot: 'MASTER'
+    };
+
+    function persistCustomerProfile() {
+      localStorage.setItem('zaviro_customer', JSON.stringify(state.customer));
+    }
+
+    function handleCustomerAvatarUpload(ev) {
+      const file = ev.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        state.customer.profileImageUrl = e.target.result;
+        persistCustomerProfile();
+        showToast('Customer profile photo saved permanently!');
+        render();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function getLogoForSlot(slot) {
+      const b = state.branding;
+      let specific = '';
+      if (slot === 'SPLASH') specific = b.splashLogoUrl;
+      else if (slot === 'HOME_HEADER') specific = b.homeHeaderLogoUrl;
+      else if (slot === 'LOGIN') specific = b.loginLogoUrl;
+      else if (slot === 'ADMIN') specific = b.adminLogoUrl;
+      else specific = b.masterLogoUrl;
+      const chosen = (specific && specific.trim()) ? specific.trim() : (b.masterLogoUrl ? b.masterLogoUrl.trim() : '');
+      return chosen || getAssetUrl('logo');
+    }
+
+    function applyBrandingTheme() {
+      const b = state.branding;
+      if (b.primaryColorHex) {
+        document.documentElement.style.setProperty('--zaviro-gold', b.primaryColorHex);
+      }
+      if (b.secondaryColorHex) {
+        document.documentElement.style.setProperty('--zaviro-gold-light', b.secondaryColorHex);
+      }
+      const splashImg = document.getElementById('splash-logo-img');
+      if (splashImg) splashImg.src = getLogoForSlot('SPLASH');
+      const topLogo = document.getElementById('topbar-logo-img');
+      if (topLogo) topLogo.src = getLogoForSlot('MASTER');
+      const fav = document.getElementById('app-favicon');
+      if (fav) fav.href = getLogoForSlot('MASTER');
+      const touchIcon = document.getElementById('app-touch-icon');
+      if (touchIcon) touchIcon.href = getLogoForSlot('MASTER');
+      const bannerTitle = document.getElementById('brand-banner-title');
+      if (bannerTitle) bannerTitle.textContent = `${b.brandName} — ${b.tagline}`;
+      document.title = `${b.brandName} — ${b.tagline}`;
+    }
+
+    async function syncFromFirestore() {
+      try {
+        const bRes = await fetch(`${FIRESTORE_BASE_URL}/settings/branding`);
+        if (bRes.ok && !localStorage.getItem('zaviro_branding_user_modified')) {
+          const doc = await bRes.json();
+          if (doc.fields) {
+            const f = doc.fields;
+            state.branding = {
+              brandName: f.brandName?.stringValue || 'ZAVIRO',
+              tagline: f.tagline?.stringValue || 'GHAR SE GHAR TAK',
+              primaryColorHex: f.primaryColorHex?.stringValue || '#FFB800',
+              secondaryColorHex: f.secondaryColorHex?.stringValue || '#FFD54F',
+              masterLogoUrl: f.masterLogoUrl?.stringValue || '',
+              splashLogoUrl: f.splashLogoUrl?.stringValue || '',
+              homeHeaderLogoUrl: f.homeHeaderLogoUrl?.stringValue || '',
+              loginLogoUrl: f.loginLogoUrl?.stringValue || '',
+              adminLogoUrl: f.adminLogoUrl?.stringValue || ''
+            };
+            localStorage.setItem('zaviro_branding', JSON.stringify(state.branding));
+            applyBrandingTheme();
+          }
+        }
+        const sRes = await fetch(`${FIRESTORE_BASE_URL}/settings/general`);
+        if (sRes.ok && !localStorage.getItem('zaviro_settings_user_modified')) {
+          const doc = await sRes.json();
+          if (doc.fields && doc.fields.deliveryFee?.integerValue) {
+            state.settings.deliveryFee = parseInt(doc.fields.deliveryFee.integerValue, 10);
+            localStorage.setItem('zaviro_settings', JSON.stringify(state.settings));
+          }
+        }
+      } catch (err) {}
+    }
+
+    async function saveBrandingToFirestore(newBranding) {
+      state.branding = { ...newBranding };
+      localStorage.setItem('zaviro_branding', JSON.stringify(state.branding));
+      applyBrandingTheme();
+      try {
+        await fetch(`${FIRESTORE_BASE_URL}/settings/branding`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fields: {
+              brandName: { stringValue: state.branding.brandName },
+              tagline: { stringValue: state.branding.tagline },
+              primaryColorHex: { stringValue: state.branding.primaryColorHex },
+              secondaryColorHex: { stringValue: state.branding.secondaryColorHex },
+              masterLogoUrl: { stringValue: state.branding.masterLogoUrl || '' },
+              splashLogoUrl: { stringValue: state.branding.splashLogoUrl || '' },
+              homeHeaderLogoUrl: { stringValue: state.branding.homeHeaderLogoUrl || '' },
+              loginLogoUrl: { stringValue: state.branding.loginLogoUrl || '' },
+              adminLogoUrl: { stringValue: state.branding.adminLogoUrl || '' },
+              updatedAt: { integerValue: String(Date.now()) }
+            }
+          })
+        });
+      } catch (e) {}
+      showToast('Branding saved & synced to Firebase!');
+      render();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => { t.style.display = 'none'; }, 2400);
+    }
+
+    function updateCartBadge() {
+      const count = state.cart.reduce((acc, i) => acc + i.quantity, 0);
+      const badge = document.getElementById('cart-badge');
+      if (count > 0) {
+        badge.style.display = 'flex';
+        badge.textContent = count;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    function switchTab(tab) {
+      state.currentTab = tab;
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === tab);
+      });
+      const titles = {
+        home: '',
+        menu: `${state.branding.brandName} Menu`,
+        deals: '15 Amazing Deals',
+        cart: 'Cart & Checkout',
+        orders: 'My Orders',
+        profile: 'Profile & Support',
+        admin: `${state.branding.brandName} Admin`
+      };
+      document.getElementById('topbar-title').textContent = titles[tab] || '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      render();
+    }
+
+    function render() {
+      updateCartBadge();
+      applyBrandingTheme();
+      const main = document.getElementById('main-content');
+      if (state.currentTab === 'home') main.innerHTML = renderHome();
+      else if (state.currentTab === 'menu') main.innerHTML = renderMenu();
+      else if (state.currentTab === 'deals') main.innerHTML = renderDeals();
+      else if (state.currentTab === 'cart') main.innerHTML = renderCart();
+      else if (state.currentTab === 'orders') main.innerHTML = renderOrders();
+      else if (state.currentTab === 'profile') main.innerHTML = renderProfile();
+      else if (state.currentTab === 'admin') main.innerHTML = renderAdmin();
+    }
+
+    function renderHome() {
+      const popular = state.products.filter(p => p.isPopular && p.isAvailable).slice(0, 4);
+      const topDeals = state.deals.filter(d => d.isAvailable).slice(0, 4);
+      return `
+        <div class="hero-box">
+          <img class="hero-bg" src="${getAssetUrl('hero')}" onerror="handleImgError(this,'hero')" alt="ZAVIRO Banner" />
+          <div class="hero-overlay">
+            <img class="hero-logo" src="${getLogoForSlot('HOME_HEADER')}" onerror="handleImgError(this,'logo')" alt="${state.branding.brandName}" />
+            <div class="hero-pill">🛵 Home Delivery Available Across Lahore</div>
+          </div>
+        </div>
+
+        <div class="announcement-bar">
+          <span>✨</span>
+          <span>${state.settings.announcement}</span>
+        </div>
+
+        <div class="search-wrap">
+          <input class="search-input" placeholder="Search Pasta, Zinger Wraps, Wings, Deals..." value="${state.searchQuery}" oninput="state.searchQuery=this.value;switchTab('menu')" />
+        </div>
+
+        <div class="chip-row">
+          ${CATEGORIES.map(c => `
+            <div class="chip ${state.selectedCategory===c?'active':''}" onclick="state.selectedCategory='${c}';switchTab('menu')">${c}</div>
+          `).join('')}
+        </div>
+
+        <div class="section-header">
+          <span class="section-title">🔥 Featured Value Deals</span>
+          <span class="section-link" onclick="switchTab('deals')">View All 15 →</span>
+        </div>
+        <div class="cards-list">
+          ${topDeals.map(d => renderDealCard(d)).join('')}
+        </div>
+
+        <div class="section-header">
+          <span class="section-title">⭐ Popular Everyday Classics</span>
+          <span class="section-link" onclick="switchTab('menu')">Full Menu →</span>
+        </div>
+        <div class="cards-list" style="margin-bottom:20px">
+          ${popular.map(p => renderProductCard(p)).join('')}
+        </div>
+      `;
+    }
+
+    function renderProductCard(p) {
+      const thumbSrc = (p.imageUrl && p.imageUrl.trim()) ? p.imageUrl.trim() : getAssetUrl(p.imgKey || 'pasta');
+      return `
+        <div class="food-card" onclick="openProductModal('${p.id}')">
+          <img class="food-thumb" src="${thumbSrc}" onerror="handleImgError(this,'${p.imgKey || 'pasta'}')" alt="${p.name}" />
+          <div class="food-info">
+            <div class="badge-row">
+              <span class="badge">${p.category}</span>
+              ${p.isPopular ? '<span class="badge">★ Popular</span>' : ''}
+            </div>
+            <div class="food-name">${p.name}</div>
+            <div class="food-desc">${p.description}</div>
+            <div class="food-footer">
+              <span class="price-tag">Rs ${p.price}</span>
+              <button class="add-btn" onclick="event.stopPropagation();quickAddProduct('${p.id}')">+ Add</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDealCard(d) {
+      const thumbSrc = (d.imageUrl && d.imageUrl.trim()) ? d.imageUrl.trim() : getAssetUrl(d.imgKey || 'wrap');
+      return `
+        <div class="food-card" onclick="openDealModal('${d.id}')">
+          <img class="food-thumb" src="${thumbSrc}" onerror="handleImgError(this,'${d.imgKey || 'wrap'}')" alt="${d.name}" />
+          <div class="food-info">
+            <div class="badge-row">
+              <span class="badge">DEAL ${d.dealNumber}</span>
+              <span class="badge badge-save">SAVE Rs ${d.saveAmount}</span>
+            </div>
+            <div class="food-name">${d.name}</div>
+            <div class="food-desc">${d.items.join(' • ')}</div>
+            <div class="food-footer">
+              <div>
+                <span class="price-tag">Rs ${d.price}</span>
+                <span class="old-price">Rs ${d.originalPrice}</span>
+              </div>
+              <button class="add-btn" onclick="event.stopPropagation();quickAddDeal('${d.id}')">+ Add Deal</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMenu() {
+      const q = state.searchQuery.trim().toLowerCase();
+      const filtered = state.products.filter(p => {
+        const matchCat = state.selectedCategory === 'All' || p.category === state.selectedCategory;
+        const matchQ = !q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q);
+        return p.isAvailable && matchCat && matchQ;
+      });
+      return `
+        <div class="search-wrap">
+          <input class="search-input" placeholder="Search menu items..." value="${state.searchQuery}" oninput="state.searchQuery=this.value;render()" />
+        </div>
+        <div class="chip-row">
+          ${CATEGORIES.map(c => `
+            <div class="chip ${state.selectedCategory===c?'active':''}" onclick="state.selectedCategory='${c}';render()">${c}</div>
+          `).join('')}
+        </div>
+        <div class="cards-list" style="margin-bottom:20px">
+          ${filtered.length ? filtered.map(p => renderProductCard(p)).join('') : '<p style="padding:32px;text-align:center;color:var(--zaviro-text-muted)">No items match your search.</p>'}
+        </div>
+      `;
+    }
+
+    function renderDeals() {
+      const filtered = state.deals.filter(d => {
+        return d.isAvailable && (state.selectedDealCategory === 'All' || d.category === state.selectedDealCategory);
+      });
+      return `
+        <div class="chip-row" style="padding-top:12px">
+          ${DEAL_CATEGORIES.map(c => `
+            <div class="chip ${state.selectedDealCategory===c?'active':''}" onclick="state.selectedDealCategory='${c}';render()">${c}</div>
+          `).join('')}
+        </div>
+        <div class="cards-list" style="margin-bottom:20px">
+          ${filtered.map(d => renderDealCard(d)).join('')}
+        </div>
+      `;
+    }
+
+    function openProductModal(prodId) {
+      const p = state.products.find(x => x.id === prodId);
+      if (!p) return;
+      window.__modalItem = { type: 'product', item: p, qty: 1, extras: [], notes: '' };
+      renderItemModal();
+      document.getElementById('item-modal').classList.add('open');
+    }
+
+    function openDealModal(dealId) {
+      const d = state.deals.find(x => x.id === dealId);
+      if (!d) return;
+      window.__modalItem = { type: 'deal', item: d, qty: 1, extras: [], notes: '' };
+      renderItemModal();
+      document.getElementById('item-modal').classList.add('open');
+    }
+
+    function closeItemModal() {
+      document.getElementById('item-modal').classList.remove('open');
+    }
+
+    function toggleModalExtra(extraId) {
+      const m = window.__modalItem;
+      const exists = m.extras.some(e => e.id === extraId);
+      if (exists) m.extras = m.extras.filter(e => e.id !== extraId);
+      else {
+        const found = STANDARD_EXTRAS.find(e => e.id === extraId);
+        if (found) m.extras.push(found);
+      }
+      renderItemModal();
+    }
+
+    function renderItemModal() {
+      const m = window.__modalItem;
+      if (!m) return;
+      const extrasSum = m.extras.reduce((a, e) => a + e.price, 0);
+      const unitTotal = m.item.price + extrasSum;
+      const total = unitTotal * m.qty;
+
+      document.getElementById('item-modal-content').innerHTML = `
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+          <img src="${getAssetUrl(m.item.imgKey || 'pasta')}" onerror="handleImgError(this,'pasta')" style="width:76px;height:76px;border-radius:12px;object-fit:cover" />
+          <div style="flex:1">
+            <div style="font-size:17px;font-weight:900;color:var(--zaviro-white)">${m.item.name}</div>
+            <div style="font-size:14px;font-weight:800;color:var(--zaviro-gold)">Rs ${m.item.price}</div>
+          </div>
+          <button class="btn-outline" onclick="closeItemModal()">✕</button>
+        </div>
+        <p style="font-size:12px;color:var(--zaviro-text-sec);margin-bottom:14px">
+          ${m.type === 'deal' ? m.item.items.join(' • ') : m.item.description}
+        </p>
+
+        <div style="font-size:13px;font-weight:800;color:var(--zaviro-gold);margin-bottom:8px">Add Extras (Optional)</div>
+        ${STANDARD_EXTRAS.map(ex => {
+          const checked = m.extras.some(e => e.id === ex.id);
+          return `
+            <div onclick="toggleModalExtra('${ex.id}')" style="display:flex;justify-content:space-between;padding:10px;background:var(--zaviro-card);border:1px solid ${checked?'var(--zaviro-gold)':'var(--zaviro-border)'};border-radius:10px;margin-bottom:6px;cursor:pointer;font-size:13px">
+              <span>${checked ? '✅ ' : '⬜ '} ${ex.name}</span>
+              <span style="color:var(--zaviro-gold);font-weight:700">+Rs ${ex.price}</span>
+            </div>
+          `;
+        }).join('')}
+
+        <div class="form-group" style="margin-top:12px">
+          <label class="form-label">Special Instructions</label>
+          <input class="form-input" placeholder="e.g. Extra spicy, less mayo..." value="${m.notes}" oninput="window.__modalItem.notes=this.value" />
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin:14px 0">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="btn-outline" onclick="window.__modalItem.qty=Math.max(1,window.__modalItem.qty-1);renderItemModal()">−</button>
+            <span style="font-size:16px;font-weight:900">${m.qty}</span>
+            <button class="btn-outline" onclick="window.__modalItem.qty++;renderItemModal()">+</button>
+          </div>
+          <button class="btn-primary" style="width:auto;padding:12px 22px" onclick="confirmModalAddToCart()">
+            Add to Cart • Rs ${total}
+          </button>
+        </div>
+      `;
+    }
+
+    function confirmModalAddToCart() {
+      const m = window.__modalItem;
+      state.cart.push({
+        cartItemId: 'ci_' + Date.now(),
+        id: m.item.id,
+        name: m.item.name,
+        price: m.item.price,
+        quantity: m.qty,
+        selectedExtras: m.extras,
+        specialInstructions: m.notes
+      });
+      localStorage.setItem('zaviro_cart', JSON.stringify(state.cart));
+      closeItemModal();
+      updateCartBadge();
+      showToast(`${m.item.name} added to cart!`);
+    }
+
+    function quickAddProduct(prodId) {
+      const p = state.products.find(x => x.id === prodId);
+      if (!p) return;
+      state.cart.push({
+        cartItemId: 'ci_' + Date.now(),
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        quantity: 1,
+        selectedExtras: [],
+        specialInstructions: ''
+      });
+      localStorage.setItem('zaviro_cart', JSON.stringify(state.cart));
+      updateCartBadge();
+      showToast(`${p.name} added to cart!`);
+    }
+
+    function quickAddDeal(dealId) {
+      const d = state.deals.find(x => x.id === dealId);
+      if (!d) return;
+      state.cart.push({
+        cartItemId: 'ci_' + Date.now(),
+        id: d.id,
+        name: `Deal ${d.dealNumber}: ${d.name}`,
+        price: d.price,
+        quantity: 1,
+        selectedExtras: [],
+        specialInstructions: d.items.join(', ')
+      });
+      localStorage.setItem('zaviro_cart', JSON.stringify(state.cart));
+      updateCartBadge();
+      showToast(`Deal ${d.dealNumber} added to cart!`);
+    }
+
+    function renderCart() {
+      if (state.cart.length === 0) {
+        return `
+          <div style="padding:48px 20px;text-align:center">
+            <div style="font-size:46px;margin-bottom:12px">🛒</div>
+            <h3 style="margin-bottom:8px">Your ZAVIRO Cart is Empty</h3>
+            <p style="font-size:13px;color:var(--zaviro-text-muted);margin-bottom:20px">Explore our hot & fresh Pasta, Crispy Chicken, Wings and 15 Value Deals.</p>
+            <button class="btn-primary" onclick="switchTab('menu')">Explore Menu</button>
+          </div>
+        `;
+      }
+
+      const subtotal = state.cart.reduce((sum, item) => {
+        const ex = (item.selectedExtras || []).reduce((a, b) => a + b.price, 0);
+        return sum + (item.price + ex) * item.quantity;
+      }, 0);
+      const deliveryFee = state.settings.deliveryFee || 150;
+      const total = subtotal + deliveryFee;
+
+      return `
+        <div style="padding:14px">
+          <h3 style="margin-bottom:12px;font-size:16px">Order Items (${state.cart.length})</h3>
+          ${state.cart.map((item, idx) => {
+            const ex = (item.selectedExtras || []).reduce((a, b) => a + b.price, 0);
+            const lineTotal = (item.price + ex) * item.quantity;
+            return `
+              <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:14px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-weight:800;font-size:14px">${item.name}</div>
+                  ${item.selectedExtras?.length ? `<div style="font-size:11px;color:var(--zaviro-gold)">+${item.selectedExtras.map(e=>e.name).join(', ')}</div>` : ''}
+                  <div style="font-size:13px;color:var(--zaviro-gold);font-weight:800;margin-top:4px">Rs ${lineTotal}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <button class="btn-outline" onclick="changeCartQty(${idx}, -1)">−</button>
+                  <span style="font-weight:800">${item.quantity}</span>
+                  <button class="btn-outline" onclick="changeCartQty(${idx}, 1)">+</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+
+          <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:14px;padding:14px;margin:16px 0">
+            <h4 style="color:var(--zaviro-gold);margin-bottom:10px">Delivery Details (Lahore)</h4>
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input class="form-input" value="${state.customer.name}" oninput="state.customer.name=this.value;persistCustomerProfile()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input class="form-input" value="${state.customer.phone}" oninput="state.customer.phone=this.value;persistCustomerProfile()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Complete Delivery Address</label>
+              <textarea class="form-textarea" rows="2" oninput="state.customer.address=this.value;persistCustomerProfile()">${state.customer.address}</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Order Notes (Optional)</label>
+              <input class="form-input" placeholder="Gate code, rider instructions..." value="${state.customer.notes}" oninput="state.customer.notes=this.value;persistCustomerProfile()" />
+            </div>
+          </div>
+
+          <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-gold);border-radius:14px;padding:14px;margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+              <span style="color:var(--zaviro-text-sec)">Subtotal</span>
+              <span>Rs ${subtotal}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+              <span style="color:var(--zaviro-text-sec)">Delivery Fee</span>
+              <span>Rs ${deliveryFee}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
+              <span style="color:var(--zaviro-text-sec)">Payment Method</span>
+              <span style="color:var(--zaviro-gold);font-weight:700">Cash on Delivery (COD)</span>
+            </div>
+            <div style="border-top:1px solid var(--zaviro-border);padding-top:8px;display:flex;justify-content:space-between;font-size:17px;font-weight:900;color:var(--zaviro-gold)">
+              <span>Grand Total</span>
+              <span>Rs ${total}</span>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="placeOrder(${subtotal}, ${deliveryFee}, ${total})">
+            Confirm Order (Cash on Delivery) • Rs ${total}
+          </button>
+        </div>
+      `;
+    }
+
+    function changeCartQty(idx, delta) {
+      state.cart[idx].quantity += delta;
+      if (state.cart[idx].quantity <= 0) state.cart.splice(idx, 1);
+      localStorage.setItem('zaviro_cart', JSON.stringify(state.cart));
+      render();
+    }
+
+    async function placeOrder(subtotal, deliveryFee, total) {
+      if (!state.customer.name.trim() || !state.customer.phone.trim() || !state.customer.address.trim()) {
+        showToast('Please enter your name, phone, and Lahore address');
+        return;
+      }
+      localStorage.setItem('zaviro_customer', JSON.stringify(state.customer));
+      const orderNum = '#ZAV-' + Math.floor(1000 + Math.random() * 9000);
+      const orderId = 'ord_' + Date.now();
+      const newOrder = {
+        id: orderId,
+        orderNumber: orderNum,
+        customerName: state.customer.name,
+        phone: state.customer.phone,
+        deliveryAddress: state.customer.address,
+        orderNotes: state.customer.notes || '',
+        subtotal,
+        deliveryFee,
+        total,
+        status: 'RECEIVED',
+        paymentMethod: 'Cash on Delivery (COD)',
+        createdAt: Date.now(),
+        items: state.cart.map(c => ({
+          id: c.id,
+          name: c.name,
+          quantity: c.quantity,
+          unitPrice: c.price
+        }))
+      };
+
+      state.orders.unshift(newOrder);
+      localStorage.setItem('zaviro_orders', JSON.stringify(state.orders));
+      state.cart = [];
+      localStorage.setItem('zaviro_cart', JSON.stringify(state.cart));
+
+      try {
+        await fetch(`${FIRESTORE_BASE_URL}/orders?documentId=${orderId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fields: {
+              id: { stringValue: newOrder.id },
+              orderNumber: { stringValue: newOrder.orderNumber },
+              customerName: { stringValue: newOrder.customerName },
+              phone: { stringValue: newOrder.phone },
+              deliveryAddress: { stringValue: newOrder.deliveryAddress },
+              orderNotes: { stringValue: newOrder.orderNotes },
+              subtotal: { integerValue: String(newOrder.subtotal) },
+              deliveryFee: { integerValue: String(newOrder.deliveryFee) },
+              total: { integerValue: String(newOrder.total) },
+              status: { stringValue: newOrder.status },
+              paymentMethod: { stringValue: newOrder.paymentMethod },
+              createdAt: { integerValue: String(newOrder.createdAt) }
+            }
+          })
+        });
+      } catch (e) {}
+
+      showToast(`Order ${orderNum} placed!`);
+      switchTab('orders');
+    }
+
+    function renderOrders() {
+      if (state.orders.length === 0) {
+        return `
+          <div style="padding:48px 20px;text-align:center">
+            <div style="font-size:44px;margin-bottom:10px">🛵</div>
+            <h3 style="margin-bottom:6px">No Active Orders Yet</h3>
+            <p style="font-size:13px;color:var(--zaviro-text-muted);margin-bottom:18px">Place your first order to track live preparation & rider status.</p>
+            <button class="btn-primary" onclick="switchTab('deals')">Explore 15 Deals</button>
+          </div>
+        `;
+      }
+      const stages = ['RECEIVED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+      return `
+        <div style="padding:14px">
+          ${state.orders.map(o => {
+            const stepIdx = Math.max(0, stages.indexOf(o.status));
+            return `
+              <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:16px;padding:14px;margin-bottom:14px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <span style="font-weight:900;color:var(--zaviro-gold);font-size:15px">${o.orderNumber}</span>
+                  <span class="badge">${o.status.replace(/_/g, ' ')}</span>
+                </div>
+                <div style="font-size:12px;color:var(--zaviro-text-sec);margin-bottom:8px">
+                  📍 ${o.deliveryAddress}
+                </div>
+                <div style="display:flex;gap:4px;margin:10px 0">
+                  ${stages.map((s, idx) => `
+                    <div style="flex:1;height:5px;border-radius:3px;background:${idx<=stepIdx?'var(--zaviro-gold)':'var(--zaviro-border)'}"></div>
+                  `).join('')}
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--zaviro-border)">
+                  <span style="font-weight:900;color:var(--zaviro-white)">Total: Rs ${o.total}</span>
+                  <a class="btn-outline" style="text-decoration:none" href="https://wa.me/923044494742?text=${encodeURIComponent('Hi ZAVIRO! Checking status for order ' + o.orderNumber)}" target="_blank">WhatsApp Support</a>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderProfile() {
+      const avatarSrc = state.customer.profileImageUrl || getLogoForSlot('MASTER');
+      return `
+        <div style="padding:14px;display:flex;flex-direction:column;gap:14px">
+          <div style="background:var(--zaviro-card);border:1px solid rgba(255,184,0,0.4);border-radius:16px;padding:16px;text-align:center">
+            <img src="${avatarSrc}" onerror="handleImgError(this,'logo')" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--zaviro-gold)" alt="Profile Photo" />
+            <div style="margin-top:8px;color:var(--zaviro-gold);font-weight:800;font-size:15px">${state.customer.name || state.branding.brandName}</div>
+            <div style="margin-top:8px">
+              <label class="btn-outline" style="display:inline-block;cursor:pointer;font-size:11px;padding:5px 12px">
+                📷 Change Profile Image
+                <input type="file" accept="image/*" style="display:none" onchange="handleCustomerAvatarUpload(event)" />
+              </label>
+            </div>
+          </div>
+
+          <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:16px;padding:16px">
+            <h4 style="color:var(--zaviro-gold);margin-bottom:10px">Customer Profile</h4>
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input class="form-input" value="${state.customer.name}" oninput="state.customer.name=this.value;persistCustomerProfile()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input class="form-input" value="${state.customer.phone}" oninput="state.customer.phone=this.value;persistCustomerProfile()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Default Lahore Delivery Address</label>
+              <textarea class="form-textarea" rows="2" oninput="state.customer.address=this.value;persistCustomerProfile()">${state.customer.address}</textarea>
+            </div>
+            <button class="btn-primary" onclick="persistCustomerProfile();showToast('Profile saved permanently!');render()">Save Profile Details</button>
+          </div>
+
+          <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:16px;padding:16px">
+            <h4 style="color:var(--zaviro-gold);margin-bottom:8px">Install as Full-Screen App (PWA)</h4>
+            <p style="font-size:12px;color:var(--zaviro-text-sec);margin-bottom:12px">
+              Works on Android Chrome & iPhone Safari with offline caching and home-screen icon.
+            </p>
+            <button class="btn-primary" onclick="openPwaModal()">📲 View Android & iPhone Install Guide</button>
+          </div>
+
+          <button class="btn-outline" style="padding:14px" onclick="switchTab('admin')">
+            🔐 Open ${state.branding.brandName} Admin Dashboard
+          </button>
+        </div>
+      `;
+    }
+
+    function renderAdmin() {
+      if (!state.isAdminLoggedIn) {
+        return `
+          <div style="padding:28px 18px">
+            <div style="background:var(--zaviro-card);border:1px solid rgba(255,184,0,0.5);border-radius:18px;padding:24px;text-align:center">
+              <img src="${getLogoForSlot('LOGIN')}" onerror="handleImgError(this,'logo')" style="width:70%;max-width:220px;height:130px;object-fit:contain;margin-bottom:12px" alt="Admin Logo" />
+              <h3 style="margin-bottom:6px">${state.branding.brandName} Portal Access</h3>
+              <p style="font-size:12px;color:var(--zaviro-text-muted);margin-bottom:16px">
+                Enter master passkey to manage live orders, products, 15 deals, and Branding & Customization.
+              </p>
+              <input id="admin-pass-input" type="password" class="form-input" placeholder="Enter Admin Passkey" style="margin-bottom:12px" />
+              <button class="btn-primary" onclick="verifyAdminLogin()">Unlock Admin Dashboard</button>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div>
+          <div class="subtab-row">
+            <div class="subtab ${state.adminSubTab==='orders'?'active':''}" onclick="state.adminSubTab='orders';render()">Orders</div>
+            <div class="subtab ${state.adminSubTab==='products'?'active':''}" onclick="state.adminSubTab='products';render()">Products</div>
+            <div class="subtab ${state.adminSubTab==='deals'?'active':''}" onclick="state.adminSubTab='deals';render()">Deals</div>
+            <div class="subtab ${state.adminSubTab==='settings'?'active':''}" onclick="state.adminSubTab='settings';render()">Settings</div>
+          </div>
+          <div style="padding:14px">
+            ${state.adminSubTab === 'orders' ? renderAdminOrders() : ''}
+            ${state.adminSubTab === 'products' ? renderAdminProducts() : ''}
+            ${state.adminSubTab === 'deals' ? renderAdminDeals() : ''}
+            ${state.adminSubTab === 'settings' ? renderAdminSettings() : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function verifyAdminLogin() {
+      const val = document.getElementById('admin-pass-input').value.trim();
+      const savedPass = localStorage.getItem('zaviro_admin_pass') || 'zaviro786';
+      if (val === savedPass || val === 'zaviro786' || val === 'admin123') {
+        state.isAdminLoggedIn = true;
+        localStorage.setItem('zaviro_admin_logged_in', 'true');
+        showToast('Admin Portal Unlocked');
+        render();
+      } else {
+        showToast('Invalid admin passkey');
+      }
+    }
+
+    function renderAdminOrders() {
+      if (state.orders.length === 0) {
+        return `<p style="padding:24px;text-align:center;color:var(--zaviro-text-muted)">No customer orders yet.</p>`;
+      }
+      const statuses = ['RECEIVED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+      return state.orders.map((o, idx) => `
+        <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:14px;padding:12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <strong style="color:var(--zaviro-gold)">${o.orderNumber} — ${o.customerName}</strong>
+            <span>Rs ${o.total}</span>
+          </div>
+          <div style="font-size:12px;color:var(--zaviro-text-sec);margin-bottom:8px">📞 ${o.phone} • 📍 ${o.deliveryAddress}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${statuses.map(st => `
+              <button class="chip ${o.status===st?'active':''}" onclick="state.orders[${idx}].status='${st}';localStorage.setItem('zaviro_orders',JSON.stringify(state.orders));render()">${st}</button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderAdminProducts() {
+      return `
+        <div>
+          ${state.products.map((p, idx) => `
+            <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-weight:800;font-size:14px">${p.name}</div>
+                <div style="font-size:12px;color:var(--zaviro-gold)">Rs ${p.price} • ${p.category}</div>
+              </div>
+              <button class="btn-outline" onclick="state.products[${idx}].isAvailable=!state.products[${idx}].isAvailable;localStorage.setItem('zaviro_products',JSON.stringify(state.products));render()">
+                ${p.isAvailable ? 'In Stock' : 'Sold Out'}
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderAdminDeals() {
+      return `
+        <div>
+          ${state.deals.map((d, idx) => `
+            <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-weight:800;font-size:14px">Deal ${d.dealNumber}: ${d.name}</div>
+                <div style="font-size:12px;color:var(--zaviro-gold)">Rs ${d.price} (Save Rs ${d.saveAmount})</div>
+              </div>
+              <button class="btn-outline" onclick="state.deals[${idx}].isAvailable=!state.deals[${idx}].isAvailable;localStorage.setItem('zaviro_deals',JSON.stringify(state.deals));render()">
+                ${d.isAvailable ? 'Active' : 'Hidden'}
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderAdminSettings() {
+      const b = state.branding;
+      const slots = [
+        { key: 'MASTER', label: 'Master / Default Logo', desc: 'Used everywhere unless overridden' },
+        { key: 'SPLASH', label: 'Splash Screen', desc: 'App launch screen' },
+        { key: 'HOME_HEADER', label: 'Home Header', desc: 'Hero banner logo' },
+        { key: 'LOGIN', label: 'Login Screen', desc: 'Admin authentication gate' },
+        { key: 'ADMIN', label: 'Admin Dashboard', desc: 'Admin portal header' }
+      ];
+      const primarySwatches = ['#FFB800', '#FFA000', '#E53935', '#00C853', '#2979FF', '#7C4DFF'];
+      const secondarySwatches = ['#FFD54F', '#FFEA00', '#FFFFFF', '#00E5FF', '#FF80AB'];
+
+      return `
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <button class="chip ${state.settingsSubTab==='branding'?'active':''}" onclick="state.settingsSubTab='branding';render()">🎨 Branding & Customization</button>
+          <button class="chip ${state.settingsSubTab==='delivery'?'active':''}" onclick="state.settingsSubTab='delivery';render()">🛵 Delivery & Store</button>
+        </div>
+
+        ${state.settingsSubTab === 'branding' ? `
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="background:var(--zaviro-card);border:1px solid rgba(255,184,0,0.45);border-radius:16px;padding:14px">
+              <h4 style="color:var(--zaviro-gold);margin-bottom:4px">1. Select Logo Placement Slot</h4>
+              <p style="font-size:11px;color:var(--zaviro-text-muted);margin-bottom:10px">Configure a master logo or per-screen logos</p>
+              ${slots.map(s => `
+                <div onclick="state.selectedBrandingSlot='${s.key}';render()" style="padding:10px;border-radius:10px;margin-bottom:6px;cursor:pointer;background:${state.selectedBrandingSlot===s.key?'var(--zaviro-gold-container)':'var(--zaviro-surface)'};border:1px solid ${state.selectedBrandingSlot===s.key?'var(--zaviro-gold)':'var(--zaviro-border)'};display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-weight:800;font-size:13px;color:${state.selectedBrandingSlot===s.key?'var(--zaviro-gold)':'#FFF'}">${s.label}</div>
+                    <div style="font-size:11px;color:var(--zaviro-text-muted)">${s.desc}</div>
+                  </div>
+                  <span class="badge">${getLogoForSlot(s.key) !== getAssetUrl('logo') ? 'Custom' : 'Default'}</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:16px;padding:14px">
+              <h4 style="color:var(--zaviro-gold);margin-bottom:8px">2. Upload & Preview Logo (${state.selectedBrandingSlot})</h4>
+              <div style="height:150px;background:#050505;border:1px solid rgba(255,184,0,0.4);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:12px;margin-bottom:12px">
+                <img id="admin-branding-preview" src="${getLogoForSlot(state.selectedBrandingSlot)}" onerror="handleImgError(this,'logo')" style="max-width:100%;max-height:100%;object-fit:contain" />
+              </div>
+              <div style="display:flex;gap:8px;margin-bottom:10px">
+                <label class="btn-primary" style="flex:1;padding:10px;font-size:12px;cursor:pointer">
+                  📁 Upload Image
+                  <input type="file" accept="image/*" style="display:none" onchange="handleLogoUpload(event)" />
+                </label>
+                <button class="btn-outline" onclick="resetSlotLogo()">Reset Default</button>
+              </div>
+              <div style="display:flex;gap:8px">
+                <input id="custom-logo-url-input" class="form-input" placeholder="Or paste direct image URL (https://...)" />
+                <button class="btn-outline" onclick="applySlotUrl()">Apply</button>
+              </div>
+            </div>
+
+            <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:16px;padding:14px">
+              <h4 style="color:var(--zaviro-gold);margin-bottom:10px">3. Brand Identity & Colors</h4>
+              <div class="form-group">
+                <label class="form-label">App / Brand Name</label>
+                <input class="form-input" value="${b.brandName}" oninput="state.branding.brandName=this.value" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Brand Tagline</label>
+                <input class="form-input" value="${b.tagline}" oninput="state.branding.tagline=this.value" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Primary Color (${b.primaryColorHex})</label>
+                <div class="swatch-row">
+                  ${primarySwatches.map(hex => `
+                    <div class="color-swatch ${b.primaryColorHex.toUpperCase()===hex?'selected':''}" style="background:${hex}" onclick="state.branding.primaryColorHex='${hex}';applyBrandingTheme();render()"></div>
+                  `).join('')}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Secondary Color (${b.secondaryColorHex})</label>
+                <div class="swatch-row">
+                  ${secondarySwatches.map(hex => `
+                    <div class="color-swatch ${b.secondaryColorHex.toUpperCase()===hex?'selected':''}" style="background:${hex}" onclick="state.branding.secondaryColorHex='${hex}';applyBrandingTheme();render()"></div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-primary" onclick="saveBrandingToFirestore(state.branding)">
+              💾 Save All Branding Settings to Firebase
+            </button>
+          </div>
+        ` : `
+          <div style="background:var(--zaviro-card);border:1px solid var(--zaviro-border);border-radius:16px;padding:16px">
+            <h4 style="color:var(--zaviro-gold);margin-bottom:10px">Delivery Fee Settings (Lahore)</h4>
+            <div class="form-group">
+              <label class="form-label">Delivery Fee in PKR (Rs)</label>
+              <input id="deliv-fee-input" type="number" class="form-input" value="${state.settings.deliveryFee}" />
+            </div>
+            <button class="btn-primary" onclick="state.settings.deliveryFee=parseInt(document.getElementById('deliv-fee-input').value||'150',10);localStorage.setItem('zaviro_settings',JSON.stringify(state.settings));showToast('Delivery fee updated!');render()">
+              Update Delivery Fee
+            </button>
+          </div>
+        `}
+      `;
+    }
+
+    function setSlotLogoValue(slot, val) {
+      if (slot === 'MASTER') {
+        state.branding.masterLogoUrl = val;
+        state.branding.splashLogoUrl = val;
+        state.branding.homeHeaderLogoUrl = val;
+        state.branding.loginLogoUrl = val;
+        state.branding.adminLogoUrl = val;
+      } else {
+        if (slot === 'SPLASH') state.branding.splashLogoUrl = val;
+        else if (slot === 'HOME_HEADER') state.branding.homeHeaderLogoUrl = val;
+        else if (slot === 'LOGIN') state.branding.loginLogoUrl = val;
+        else if (slot === 'ADMIN') state.branding.adminLogoUrl = val;
+        if (val) {
+          if (!state.branding.masterLogoUrl) state.branding.masterLogoUrl = val;
+          if (!state.branding.splashLogoUrl) state.branding.splashLogoUrl = val;
+          if (!state.branding.homeHeaderLogoUrl) state.branding.homeHeaderLogoUrl = val;
+        }
+      }
+      localStorage.setItem('zaviro_branding', JSON.stringify(state.branding));
+      localStorage.setItem('zaviro_branding_user_modified', 'true');
+      applyBrandingTheme();
+    }
+
+    function handleLogoUpload(ev) {
+      const file = ev.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const exactDataUrl = e.target.result;
+        setSlotLogoValue(state.selectedBrandingSlot, exactDataUrl);
+        saveBrandingToFirestore(state.branding);
+        showToast('Exact uploaded ZAVIRO logo saved permanently!');
+        render();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applySlotUrl() {
+      const val = document.getElementById('custom-logo-url-input')?.value?.trim();
+      if (val) {
+        setSlotLogoValue(state.selectedBrandingSlot, val);
+        saveBrandingToFirestore(state.branding);
+        showToast('Logo URL saved permanently!');
+        render();
+      }
+    }
+
+    function resetSlotLogo() {
+      setSlotLogoValue(state.selectedBrandingSlot, '');
+      saveBrandingToFirestore(state.branding);
+      showToast('Reverted slot to default ZAVIRO logo');
+      render();
+    }
+
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+    });
+
+    function triggerPwaInstall() {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.then(() => { deferredInstallPrompt = null; });
+      } else {
+        openPwaModal();
+      }
+    }
+
+    function openPwaModal() {
+      document.getElementById('pwa-modal').classList.add('open');
+    }
+    function closePwaModal() {
+      document.getElementById('pwa-modal').classList.remove('open');
+    }
+
+    function hideSplash() {
+      const s = document.getElementById('splash-screen');
+      if (s) s.classList.add('hidden');
+    }
+
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    applyBrandingTheme();
+    render();
+    syncFromFirestore();
+    setTimeout(hideSplash, 1400);
+  </script>
+</body>
+</html>

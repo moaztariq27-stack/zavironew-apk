@@ -1,0 +1,358 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Default-Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ==================== PRIMITIVE HELPERS ====================
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isBootstrappedAdmin() {
+      return isSignedIn() &&
+             'email' in request.auth.token &&
+             'email_verified' in request.auth.token &&
+             request.auth.token.email == 'moaztariq27@gmail.com' &&
+             request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() ||
+             (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidTimestamp(ts) {
+      return ts is timestamp && ts <= request.time;
+    }
+
+    // ==================== ENTITY VALIDATION BLUEPRINTS ====================
+
+    function isValidAdminUser(data, adminId) {
+      return data.keys().hasAll(['uid', 'email', 'createdAt']) &&
+             data.keys().hasOnly(['uid', 'email', 'createdAt']) &&
+             data.uid is string && data.uid == adminId && data.uid.size() >= 1 && data.uid.size() <= 128 &&
+             data.email is string && data.email.size() >= 3 && data.email.size() <= 150 &&
+             isValidTimestamp(data.createdAt);
+    }
+
+    function isValidCustomerProfile(data, userId) {
+      return data.keys().hasAll(['uid', 'name', 'createdAt', 'updatedAt']) &&
+             data.keys().hasOnly([
+               'uid', 'name', 'phone', 'email', 'address', 'notes',
+               'profileImageUrl', 'authProvider', 'isAuthenticated',
+               'createdAt', 'updatedAt'
+             ]) &&
+             data.uid is string && data.uid == userId && data.uid.size() >= 1 && data.uid.size() <= 128 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 120 &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 40)) &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 150)) &&
+             (!('address' in data) || (data.address is string && data.address.size() <= 500)) &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 500)) &&
+             (!('profileImageUrl' in data) || (data.profileImageUrl is string && data.profileImageUrl.size() <= 350000)) &&
+             (!('authProvider' in data) || (data.authProvider is string && data.authProvider in ['google', 'phone', ''])) &&
+             (!('isAuthenticated' in data) || data.isAuthenticated is bool) &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidOrderStatus(status) {
+      return status is string &&
+             status in ['RECEIVED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'];
+    }
+
+    function isValidOrder(data, orderId) {
+      return data.keys().hasAll([
+               'id', 'orderNumber', 'customerUid', 'customerName', 'phone',
+               'deliveryAddress', 'subtotal', 'deliveryFee', 'total',
+               'status', 'paymentMethod', 'items', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'id', 'orderNumber', 'customerUid', 'customerName', 'phone',
+               'customerEmail', 'deliveryAddress', 'orderNotes',
+               'subtotal', 'deliveryFee', 'total', 'status',
+               'paymentMethod', 'items', 'createdAt', 'updatedAt'
+             ]) &&
+             data.id is string && data.id == orderId && data.id.size() >= 1 && data.id.size() <= 128 &&
+             data.orderNumber is string && data.orderNumber.size() >= 3 && data.orderNumber.size() <= 32 &&
+             data.customerUid is string && data.customerUid.size() >= 1 && data.customerUid.size() <= 128 &&
+             data.customerName is string && data.customerName.size() >= 1 && data.customerName.size() <= 120 &&
+             data.phone is string && data.phone.size() >= 3 && data.phone.size() <= 40 &&
+             (!('customerEmail' in data) || (data.customerEmail is string && data.customerEmail.size() <= 150)) &&
+             data.deliveryAddress is string && data.deliveryAddress.size() >= 3 && data.deliveryAddress.size() <= 500 &&
+             (!('orderNotes' in data) || (data.orderNotes is string && data.orderNotes.size() <= 500)) &&
+             data.subtotal is int && data.subtotal >= 0 && data.subtotal <= 10000000 &&
+             data.deliveryFee is int && data.deliveryFee >= 0 && data.deliveryFee <= 100000 &&
+             data.total is int && data.total == data.subtotal + data.deliveryFee &&
+             isValidOrderStatus(data.status) &&
+             data.paymentMethod is string && data.paymentMethod.size() >= 1 && data.paymentMethod.size() <= 100 &&
+             data.items is list && data.items.size() >= 1 && data.items.size() <= 50 &&
+             data.items[0] is map &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidProduct(data, productId) {
+      return data.keys().hasAll(['id', 'name', 'category', 'price', 'isAvailable', 'isDeleted', 'updatedAt']) &&
+             data.keys().hasOnly([
+               'id', 'name', 'category', 'description', 'ingredients',
+               'price', 'isAvailable', 'isPopular', 'imageUrl', 'isDeleted', 'updatedAt'
+             ]) &&
+             data.id is string && data.id == productId && data.id.size() >= 1 && data.id.size() <= 128 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 150 &&
+             data.category is string && data.category.size() >= 1 && data.category.size() <= 80 &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 1000)) &&
+             (!('ingredients' in data) || (data.ingredients is string && data.ingredients.size() <= 1000)) &&
+             data.price is int && data.price >= 0 && data.price <= 1000000 &&
+             data.isAvailable is bool &&
+             (!('isPopular' in data) || data.isPopular is bool) &&
+             (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 500000)) &&
+             data.isDeleted is bool &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidDeal(data, dealId) {
+      return data.keys().hasAll(['id', 'dealNumber', 'name', 'category', 'items', 'price', 'isAvailable', 'isDeleted', 'updatedAt']) &&
+             data.keys().hasOnly([
+               'id', 'dealNumber', 'name', 'category', 'items', 'description',
+               'price', 'originalPrice', 'saveAmount', 'isAvailable', 'imageUrl', 'isDeleted', 'updatedAt'
+             ]) &&
+             data.id is string && data.id == dealId && data.id.size() >= 1 && data.id.size() <= 128 &&
+             data.dealNumber is int && data.dealNumber >= 1 && data.dealNumber <= 1000 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 150 &&
+             data.category is string && data.category.size() >= 1 && data.category.size() <= 80 &&
+             data.items is list && data.items.size() >= 1 && data.items.size() <= 30 &&
+             data.items[0] is string && data.items[0].size() <= 200 &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 1000)) &&
+             data.price is int && data.price >= 0 && data.price <= 1000000 &&
+             (!('originalPrice' in data) || (data.originalPrice is int && data.originalPrice >= 0 && data.originalPrice <= 1000000)) &&
+             (!('saveAmount' in data) || (data.saveAmount is int && data.saveAmount >= 0 && data.saveAmount <= 1000000)) &&
+             data.isAvailable is bool &&
+             (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 500000)) &&
+             data.isDeleted is bool &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidExtra(data, extraId) {
+      return data.keys().hasAll(['id', 'name', 'price', 'isAvailable', 'isDeleted', 'updatedAt']) &&
+             data.keys().hasOnly(['id', 'name', 'price', 'description', 'isAvailable', 'imageUrl', 'isDeleted', 'updatedAt']) &&
+             data.id is string && data.id == extraId && data.id.size() >= 1 && data.id.size() <= 128 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 120 &&
+             data.price is int && data.price >= 0 && data.price <= 100000 &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 500)) &&
+             data.isAvailable is bool &&
+             (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 350000)) &&
+             data.isDeleted is bool &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidGeneralSettings(data) {
+      return data.keys().hasAll(['deliveryFee', 'minOrderAmount', 'isStoreOpen', 'updatedAt']) &&
+             data.keys().hasOnly([
+               'deliveryFee', 'minOrderAmount', 'isStoreOpen', 'announcement',
+               'whatsappNumber', 'formattedWhatsappForUrl', 'instagramHandle',
+               'deliveryAreas', 'updatedAt'
+             ]) &&
+             data.deliveryFee is int && data.deliveryFee >= 0 && data.deliveryFee <= 100000 &&
+             data.minOrderAmount is int && data.minOrderAmount >= 0 && data.minOrderAmount <= 1000000 &&
+             data.isStoreOpen is bool &&
+             (!('announcement' in data) || (data.announcement is string && data.announcement.size() <= 500)) &&
+             (!('whatsappNumber' in data) || (data.whatsappNumber is string && data.whatsappNumber.size() <= 40)) &&
+             (!('formattedWhatsappForUrl' in data) || (data.formattedWhatsappForUrl is string && data.formattedWhatsappForUrl.size() <= 40)) &&
+             (!('instagramHandle' in data) || (data.instagramHandle is string && data.instagramHandle.size() <= 100)) &&
+             (!('deliveryAreas' in data) || (data.deliveryAreas is string && data.deliveryAreas.size() <= 500)) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidBrandingSettings(data) {
+      return data.keys().hasAll(['brandName', 'tagline', 'primaryColorHex', 'secondaryColorHex', 'updatedAt']) &&
+             data.keys().hasOnly([
+               'brandName', 'tagline', 'primaryColorHex', 'secondaryColorHex',
+               'masterLogoUrl', 'splashLogoUrl', 'homeHeaderLogoUrl',
+               'loginLogoUrl', 'adminLogoUrl', 'updatedAt'
+             ]) &&
+             data.brandName is string && data.brandName.size() >= 1 && data.brandName.size() <= 80 &&
+             data.tagline is string && data.tagline.size() >= 1 && data.tagline.size() <= 150 &&
+             data.primaryColorHex is string && data.primaryColorHex.size() >= 4 && data.primaryColorHex.size() <= 16 &&
+             data.secondaryColorHex is string && data.secondaryColorHex.size() >= 4 && data.secondaryColorHex.size() <= 16 &&
+             (!('masterLogoUrl' in data) || (data.masterLogoUrl is string && data.masterLogoUrl.size() <= 500000)) &&
+             (!('splashLogoUrl' in data) || (data.splashLogoUrl is string && data.splashLogoUrl.size() <= 500000)) &&
+             (!('homeHeaderLogoUrl' in data) || (data.homeHeaderLogoUrl is string && data.homeHeaderLogoUrl.size() <= 500000)) &&
+             (!('loginLogoUrl' in data) || (data.loginLogoUrl is string && data.loginLogoUrl.size() <= 500000)) &&
+             (!('adminLogoUrl' in data) || (data.adminLogoUrl is string && data.adminLogoUrl.size() <= 500000)) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidAdminSecurity(data) {
+      return !('adminPassword' in data) &&
+             data.keys().hasAll(['schemaVersion', 'passwordHash', 'passwordSalt', 'hasCustomPassword', 'updatedAt']) &&
+             data.keys().hasOnly(['schemaVersion', 'passwordHash', 'passwordSalt', 'hasCustomPassword', 'updatedAt']) &&
+             data.schemaVersion is int && data.schemaVersion >= 6 &&
+             data.passwordHash is string && data.passwordHash.size() <= 256 &&
+             data.passwordSalt is string && data.passwordSalt.size() <= 128 &&
+             data.hasCustomPassword is bool &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    // ==================== COLLECTION MATCH BLOCKS ====================
+
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && isValidId(adminId) && (isOwner(adminId) || isAdmin());
+      allow list: if false;
+      allow create: if isSignedIn() && isValidId(adminId) && isValidAdminUser(incoming(), adminId) && isBootstrappedAdmin();
+      allow update: if isSignedIn() && isValidId(adminId) && isValidAdminUser(incoming(), adminId) && isBootstrappedAdmin() &&
+                       incoming().uid == existing().uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['email']);
+      allow delete: if isSignedIn() && isValidId(adminId) && isBootstrappedAdmin();
+    }
+
+    match /customers/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidId(userId) && isValidCustomerProfile(incoming(), userId) && (isOwner(userId) || isAdmin());
+      allow update: if isSignedIn() && isValidId(userId) && isValidCustomerProfile(incoming(), userId) && (
+                      isAdmin() ||
+                      (isOwner(userId) &&
+                       incoming().uid == existing().uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'name', 'phone', 'email', 'address', 'notes',
+                         'profileImageUrl', 'authProvider', 'isAuthenticated', 'updatedAt'
+                       ]))
+                    );
+      allow delete: if isSignedIn() && isValidId(userId) && (isOwner(userId) || isAdmin());
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidId(userId) && isValidCustomerProfile(incoming(), userId) && (isOwner(userId) || isAdmin());
+      allow update: if isSignedIn() && isValidId(userId) && isValidCustomerProfile(incoming(), userId) && (
+                      isAdmin() ||
+                      (isOwner(userId) &&
+                       incoming().uid == existing().uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'name', 'phone', 'email', 'address', 'notes',
+                         'profileImageUrl', 'authProvider', 'isAuthenticated', 'updatedAt'
+                       ]))
+                    );
+      allow delete: if isSignedIn() && isValidId(userId) && (isOwner(userId) || isAdmin());
+    }
+
+    match /orders/{orderId} {
+      allow get: if isSignedIn() && isValidId(orderId) && (resource.data.customerUid == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.customerUid == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidId(orderId) && isValidOrder(incoming(), orderId) &&
+                       incoming().customerUid == request.auth.uid &&
+                       incoming().status == 'RECEIVED';
+      allow update: if isSignedIn() && isValidId(orderId) && isValidOrder(incoming(), orderId) && (
+                      isAdmin() ||
+                      (existing().customerUid == request.auth.uid &&
+                       incoming().id == existing().id &&
+                       incoming().customerUid == existing().customerUid &&
+                       incoming().createdAt == existing().createdAt &&
+                       existing().status == 'RECEIVED' &&
+                       incoming().status == 'CANCELLED' &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['status', 'orderNotes', 'updatedAt']))
+                    );
+      allow delete: if isSignedIn() && isValidId(orderId) && isAdmin();
+    }
+
+    match /products/{productId} {
+      allow get: if isValidId(productId) && (resource == null || resource.data.isDeleted == false || isAdmin());
+      allow list: if resource.data.isDeleted == false || isAdmin();
+      allow create: if isSignedIn() && isValidId(productId) && isValidProduct(incoming(), productId) && isAdmin();
+      allow update: if isSignedIn() && isValidId(productId) && isValidProduct(incoming(), productId) && isAdmin() &&
+                       incoming().id == existing().id &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'name', 'category', 'description', 'ingredients',
+                         'price', 'isAvailable', 'isPopular', 'imageUrl', 'isDeleted', 'updatedAt'
+                       ]);
+      allow delete: if isSignedIn() && isValidId(productId) && isAdmin();
+    }
+
+    match /deals/{dealId} {
+      allow get: if isValidId(dealId) && (resource == null || resource.data.isDeleted == false || isAdmin());
+      allow list: if resource.data.isDeleted == false || isAdmin();
+      allow create: if isSignedIn() && isValidId(dealId) && isValidDeal(incoming(), dealId) && isAdmin();
+      allow update: if isSignedIn() && isValidId(dealId) && isValidDeal(incoming(), dealId) && isAdmin() &&
+                       incoming().id == existing().id &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'dealNumber', 'name', 'category', 'items', 'description',
+                         'price', 'originalPrice', 'saveAmount', 'isAvailable', 'imageUrl', 'isDeleted', 'updatedAt'
+                       ]);
+      allow delete: if isSignedIn() && isValidId(dealId) && isAdmin();
+    }
+
+    match /extras/{extraId} {
+      allow get: if isValidId(extraId) && (resource == null || resource.data.isDeleted == false || isAdmin());
+      allow list: if resource.data.isDeleted == false || isAdmin();
+      allow create: if isSignedIn() && isValidId(extraId) && isValidExtra(incoming(), extraId) && isAdmin();
+      allow update: if isSignedIn() && isValidId(extraId) && isValidExtra(incoming(), extraId) && isAdmin() &&
+                       incoming().id == existing().id &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'name', 'price', 'description', 'isAvailable', 'imageUrl', 'isDeleted', 'updatedAt'
+                       ]);
+      allow delete: if isSignedIn() && isValidId(extraId) && isAdmin();
+    }
+
+    match /settings/general {
+      allow get: if true;
+      allow list: if false;
+      allow create: if isSignedIn() && isValidGeneralSettings(incoming()) && isAdmin();
+      allow update: if isSignedIn() && isValidGeneralSettings(incoming()) && isAdmin() &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'deliveryFee', 'minOrderAmount', 'isStoreOpen', 'announcement',
+                         'whatsappNumber', 'formattedWhatsappForUrl', 'instagramHandle',
+                         'deliveryAreas', 'updatedAt'
+                       ]);
+      allow delete: if false;
+    }
+
+    match /settings/branding {
+      allow get: if true;
+      allow list: if false;
+      allow create: if isSignedIn() && isValidBrandingSettings(incoming()) && isAdmin();
+      allow update: if isSignedIn() && isValidBrandingSettings(incoming()) && isAdmin() &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'brandName', 'tagline', 'primaryColorHex', 'secondaryColorHex',
+                         'masterLogoUrl', 'splashLogoUrl', 'homeHeaderLogoUrl',
+                         'loginLogoUrl', 'adminLogoUrl', 'updatedAt'
+                       ]);
+      allow delete: if false;
+    }
+
+    match /settings/admin_security {
+      allow get: if isSignedIn() && isAdmin();
+      allow list: if false;
+      allow create: if isSignedIn() && isValidAdminSecurity(incoming()) && isAdmin();
+      allow update: if isSignedIn() && isValidAdminSecurity(incoming()) && isAdmin() &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'schemaVersion', 'passwordHash', 'passwordSalt', 'hasCustomPassword', 'updatedAt'
+                       ]);
+      allow delete: if false;
+    }
+  }
+}

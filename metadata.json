@@ -1,0 +1,8 @@
+{
+  "name": "ZAVIRO PAKISTAN",
+  "description": "ZAVIRO - GHAR SE GHAR TAK. Premium Pakistani Food Ordering: Pasta, Crispy Chicken, Wings, Wraps, Deals \u0026 Delivery.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
