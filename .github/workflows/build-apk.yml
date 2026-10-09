@@ -9,6 +9,9 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   build-apk:
     runs-on: ubuntu-latest
@@ -18,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Temurin Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -53,6 +56,48 @@ jobs:
 
       - name: Create temporary debug keystore
         run: |
+          if [ ! -f ".env" ]; then
+            if [ -f ".env.example" ]; then
+              cp .env.example .env
+            else
+              touch .env
+            fi
+          fi
+          for GRADLE_HOME_DIR in "${HOME}/.gradle" "${GRADLE_USER_HOME:-${HOME}/.gradle}"; do
+            mkdir -p "${GRADLE_HOME_DIR}"
+            if ! grep -q "org.gradle.configuration-cache=false" "${GRADLE_HOME_DIR}/gradle.properties" 2>/dev/null; then
+              echo "org.gradle.configuration-cache=false" >> "${GRADLE_HOME_DIR}/gradle.properties"
+            fi
+          done
+          for SDK_DIR in "${ANDROID_HOME:-}" "${ANDROID_SDK_ROOT:-}" "/usr/local/lib/android/sdk"; do
+            if [ -n "${SDK_DIR}" ] && [ -d "${SDK_DIR}" ]; then
+              mkdir -p "${SDK_DIR}/licenses"
+              printf "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63b6825ea9c5514f83c2829b004d1fee\n" > "${SDK_DIR}/licenses/android-sdk-license"
+              printf "\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7af1a06de9f4b1727b84351f2910\n" > "${SDK_DIR}/licenses/android-sdk-preview-license"
+              printf "\n859f317696f67ef3d7f30a50a5560e7834b43903\n" > "${SDK_DIR}/licenses/android-sdk-arm-dbt-license"
+              printf "\n601085b94cd77f0b54ff86406957099ebe79c4d6\n" > "${SDK_DIR}/licenses/android-googletv-license"
+              printf "\n33b6a2b64607f11b759f320ef9dff4ae5c47d97a\n" > "${SDK_DIR}/licenses/google-gdk-license"
+              printf "\ne9acab5b5fbb560a72cfaecce8946896ff6aab9d\n" > "${SDK_DIR}/licenses/mips-android-sysimage-license"
+              SDKMANAGER_BIN=""
+              if [ -x "${SDK_DIR}/cmdline-tools/latest/bin/sdkmanager" ]; then
+                SDKMANAGER_BIN="${SDK_DIR}/cmdline-tools/latest/bin/sdkmanager"
+              elif command -v sdkmanager >/dev/null 2>&1; then
+                SDKMANAGER_BIN="$(command -v sdkmanager)"
+              fi
+              if [ -n "${SDKMANAGER_BIN}" ]; then
+                yes | "${SDKMANAGER_BIN}" --sdk_root="${SDK_DIR}" --licenses >/dev/null 2>&1 || true
+                if [ ! -d "${SDK_DIR}/platforms/android-36.1" ]; then
+                  "${SDKMANAGER_BIN}" --sdk_root="${SDK_DIR}" "platforms;android-36.1" || true
+                fi
+              fi
+            fi
+          done
+          if [ ! -f "app/google-services.json" ]; then
+            mkdir -p app
+            base64 -d << 'EOF' > app/google-services.json
+          ewogICJwcm9qZWN0X2luZm8iOiB7CiAgICAicHJvamVjdF9udW1iZXIiOiAiOTE0NjMyMzkzMzEwIiwKICAgICJwcm9qZWN0X2lkIjogImdlbi1sYW5nLWNsaWVudC0wNzM3ODY3MzM5IiwKICAgICJzdG9yYWdlX2J1Y2tldCI6ICJnZW4tbGFuZy1jbGllbnQtMDczNzg2NzMzOS5maXJlYmFzZXN0b3JhZ2UuYXBwIgogIH0sCiAgImNsaWVudCI6IFsKICAgIHsKICAgICAgImNsaWVudF9pbmZvIjogewogICAgICAgICJtb2JpbGVzZGtfYXBwX2lkIjogIjE6OTE0NjMyMzkzMzEwOmFuZHJvaWQ6NDEyZjZkY2UxZTJkMjAzNzVkMmFjZiIsCiAgICAgICAgImFuZHJvaWRfY2xpZW50X2luZm8iOiB7CiAgICAgICAgICAicGFja2FnZV9uYW1lIjogImNvbS5haXN0dWRpby56YXZpcm8ubXNoZHljIgogICAgICAgIH0KICAgICAgfSwKICAgICAgIm9hdXRoX2NsaWVudCI6IFsKICAgICAgICB7CiAgICAgICAgICAiY2xpZW50X2lkIjogIjkxNDYzMjM5MzMxMC03b2g5ZmFwM3Zha3FycGd0c2c3azkxcmw4bW41ZGNkMi5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsCiAgICAgICAgICAiY2xpZW50X3R5cGUiOiAxLAogICAgICAgICAgImFuZHJvaWRfaW5mbyI6IHsKICAgICAgICAgICAgInBhY2thZ2VfbmFtZSI6ICJjb20uYWlzdHVkaW8uemF2aXJvLm1zaGR5YyIsCiAgICAgICAgICAgICJjZXJ0aWZpY2F0ZV9oYXNoIjogIjVkNTExNGI4MjNjM2I2ZjIyNjAxZjg4YjkzOTY2YTQwN2VlOTNmMTIiCiAgICAgICAgICB9CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAiY2xpZW50X2lkIjogIjkxNDYzMjM5MzMxMC12N2YzZW05ZXN1dTdyOWc5aTN1cmJtOGZjbHA2dXRobS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsCiAgICAgICAgICAiY2xpZW50X3R5cGUiOiAzCiAgICAgICAgfQogICAgICBdLAogICAgICAiYXBpX2tleSI6IFsKICAgICAgICB7CiAgICAgICAgICAiY3VycmVudF9rZXkiOiAiQUl6YVN5QjAtVTJDRE9vQmFoQnZzYmpCbXF6TFAtZkFjakRQRHRzIgogICAgICAgIH0KICAgICAgXSwKICAgICAgInNlcnZpY2VzIjogewogICAgICAgICJhcHBpbnZpdGVfc2VydmljZSI6IHsKICAgICAgICAgICJvdGhlcl9wbGF0Zm9ybV9vYXV0aF9jbGllbnQiOiBbCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAiY2xpZW50X2lkIjogIjkxNDYzMjM5MzMxMC12N2YzZW05ZXN1dTdyOWc5aTN1cmJtOGZjbHA2dXRobS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsCiAgICAgICAgICAgICAgImNsaWVudF90eXBlIjogMwogICAgICAgICAgICB9CiAgICAgICAgICBdCiAgICAgICAgfQogICAgICB9CiAgICB9LAogICAgewogICAgICAiY2xpZW50X2luZm8iOiB7CiAgICAgICAgIm1vYmlsZXNka19hcHBfaWQiOiAiMTo5MTQ2MzIzOTMzMTA6YW5kcm9pZDoyYjYyOWQ5MDE2YjIyYWExNWQyYWNmIiwKICAgICAgICAiYW5kcm9pZF9jbGllbnRfaW5mbyI6IHsKICAgICAgICAgICJwYWNrYWdlX25hbWUiOiAiY29tLmFpc3R1ZGlvLnphdmlyby5wa2Zvb2QiCiAgICAgICAgfQogICAgICB9LAogICAgICAib2F1dGhfY2xpZW50IjogWwogICAgICAgIHsKICAgICAgICAgICJjbGllbnRfaWQiOiAiOTE0NjMyMzkzMzEwLWNvOGFvdDRiZHQwNmkzNGQ3YnVlM2Y1cWY3NmZjbmtuLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwKICAgICAgICAgICJjbGllbnRfdHlwZSI6IDEsCiAgICAgICAgICAiYW5kcm9pZF9pbmZvIjogewogICAgICAgICAgICAicGFja2FnZV9uYW1lIjogImNvbS5haXN0dWRpby56YXZpcm8ucGtmb29kIiwKICAgICAgICAgICAgImNlcnRpZmljYXRlX2hhc2giOiAiNDkwOTcxOGI0ZjlhOThiNWYzMzAxYzY4Y2VhYjc3NzZiYzJiY2Q0ZCIKICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJjbGllbnRfaWQiOiAiOTE0NjMyMzkzMzEwLXY3ZjNlbTllc3V1N3I5ZzlpM3VyYm04ZmNscDZ1dGhtLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwKICAgICAgICAgICJjbGllbnRfdHlwZSI6IDMKICAgICAgICB9CiAgICAgIF0sCiAgICAgICJhcGlfa2V5IjogWwogICAgICAgIHsKICAgICAgICAgICJjdXJyZW50X2tleSI6ICJBSXphU3lCMC1VMkNET29CYWhCdnNiakJtcXpMUC1mQWNqRFBEdHMiCiAgICAgICAgfQogICAgICBdLAogICAgICAic2VydmljZXMiOiB7CiAgICAgICAgImFwcGludml0ZV9zZXJ2aWNlIjogewogICAgICAgICAgIm90aGVyX3BsYXRmb3JtX29hdXRoX2NsaWVudCI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICJjbGllbnRfaWQiOiAiOTE0NjMyMzkzMzEwLXY3ZjNlbTllc3V1N3I5ZzlpM3VyYm04ZmNscDZ1dGhtLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwKICAgICAgICAgICAgICAiY2xpZW50X3R5cGUiOiAzCiAgICAgICAgICAgIH0KICAgICAgICAgIF0KICAgICAgICB9CiAgICAgIH0KICAgIH0KICBdLAogICJjb25maWd1cmF0aW9uX3ZlcnNpb24iOiAiMSIKfQ==
+          EOF
+          fi
           if [ -f "./debug.keystore" ]; then
             echo "./debug.keystore already exists."
           else
