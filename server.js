@@ -14,11 +14,25 @@ const MIME_TYPES = {
   '.jpeg': 'image/jpeg',
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon'
+  '.ico': 'image/x-icon',
+  '.apk': 'application/vnd.android.package-archive'
 };
 
 function resolveFilePath(urlPath) {
   const cleanPath = decodeURIComponent(urlPath.split('?')[0]);
+
+  if (cleanPath.toLowerCase().endsWith('.apk')) {
+    const apkCandidates = [
+      path.join(__dirname, '.build-outputs', 'app-debug.apk'),
+      path.join(__dirname, 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk'),
+      path.join(__dirname, path.basename(cleanPath))
+    ];
+    for (const candidate of apkCandidates) {
+      if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+        return candidate;
+      }
+    }
+  }
 
   if (cleanPath === '/' || cleanPath === '/index.html') {
     if (fs.existsSync(path.join(__dirname, 'index.html'))) {

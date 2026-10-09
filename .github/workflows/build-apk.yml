@@ -98,19 +98,16 @@ jobs:
           ewogICJwcm9qZWN0X2luZm8iOiB7CiAgICAicHJvamVjdF9udW1iZXIiOiAiOTE0NjMyMzkzMzEwIiwKICAgICJwcm9qZWN0X2lkIjogImdlbi1sYW5nLWNsaWVudC0wNzM3ODY3MzM5IiwKICAgICJzdG9yYWdlX2J1Y2tldCI6ICJnZW4tbGFuZy1jbGllbnQtMDczNzg2NzMzOS5maXJlYmFzZXN0b3JhZ2UuYXBwIgogIH0sCiAgImNsaWVudCI6IFsKICAgIHsKICAgICAgImNsaWVudF9pbmZvIjogewogICAgICAgICJtb2JpbGVzZGtfYXBwX2lkIjogIjE6OTE0NjMyMzkzMzEwOmFuZHJvaWQ6NDEyZjZkY2UxZTJkMjAzNzVkMmFjZiIsCiAgICAgICAgImFuZHJvaWRfY2xpZW50X2luZm8iOiB7CiAgICAgICAgICAicGFja2FnZV9uYW1lIjogImNvbS5haXN0dWRpby56YXZpcm8ubXNoZHljIgogICAgICAgIH0KICAgICAgfSwKICAgICAgIm9hdXRoX2NsaWVudCI6IFsKICAgICAgICB7CiAgICAgICAgICAiY2xpZW50X2lkIjogIjkxNDYzMjM5MzMxMC03b2g5ZmFwM3Zha3FycGd0c2c3azkxcmw4bW41ZGNkMi5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsCiAgICAgICAgICAiY2xpZW50X3R5cGUiOiAxLAogICAgICAgICAgImFuZHJvaWRfaW5mbyI6IHsKICAgICAgICAgICAgInBhY2thZ2VfbmFtZSI6ICJjb20uYWlzdHVkaW8uemF2aXJvLm1zaGR5YyIsCiAgICAgICAgICAgICJjZXJ0aWZpY2F0ZV9oYXNoIjogIjVkNTExNGI4MjNjM2I2ZjIyNjAxZjg4YjkzOTY2YTQwN2VlOTNmMTIiCiAgICAgICAgICB9CiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAiY2xpZW50X2lkIjogIjkxNDYzMjM5MzMxMC12N2YzZW05ZXN1dTdyOWc5aTN1cmJtOGZjbHA2dXRobS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsCiAgICAgICAgICAiY2xpZW50X3R5cGUiOiAzCiAgICAgICAgfQogICAgICBdLAogICAgICAiYXBpX2tleSI6IFsKICAgICAgICB7CiAgICAgICAgICAiY3VycmVudF9rZXkiOiAiQUl6YVN5QjAtVTJDRE9vQmFoQnZzYmpCbXF6TFAtZkFjakRQRHRzIgogICAgICAgIH0KICAgICAgXSwKICAgICAgInNlcnZpY2VzIjogewogICAgICAgICJhcHBpbnZpdGVfc2VydmljZSI6IHsKICAgICAgICAgICJvdGhlcl9wbGF0Zm9ybV9vYXV0aF9jbGllbnQiOiBbCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAiY2xpZW50X2lkIjogIjkxNDYzMjM5MzMxMC12N2YzZW05ZXN1dTdyOWc5aTN1cmJtOGZjbHA2dXRobS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsCiAgICAgICAgICAgICAgImNsaWVudF90eXBlIjogMwogICAgICAgICAgICB9CiAgICAgICAgICBdCiAgICAgICAgfQogICAgICB9CiAgICB9LAogICAgewogICAgICAiY2xpZW50X2luZm8iOiB7CiAgICAgICAgIm1vYmlsZXNka19hcHBfaWQiOiAiMTo5MTQ2MzIzOTMzMTA6YW5kcm9pZDoyYjYyOWQ5MDE2YjIyYWExNWQyYWNmIiwKICAgICAgICAiYW5kcm9pZF9jbGllbnRfaW5mbyI6IHsKICAgICAgICAgICJwYWNrYWdlX25hbWUiOiAiY29tLmFpc3R1ZGlvLnphdmlyby5wa2Zvb2QiCiAgICAgICAgfQogICAgICB9LAogICAgICAib2F1dGhfY2xpZW50IjogWwogICAgICAgIHsKICAgICAgICAgICJjbGllbnRfaWQiOiAiOTE0NjMyMzkzMzEwLWNvOGFvdDRiZHQwNmkzNGQ3YnVlM2Y1cWY3NmZjbmtuLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwKICAgICAgICAgICJjbGllbnRfdHlwZSI6IDEsCiAgICAgICAgICAiYW5kcm9pZF9pbmZvIjogewogICAgICAgICAgICAicGFja2FnZV9uYW1lIjogImNvbS5haXN0dWRpby56YXZpcm8ucGtmb29kIiwKICAgICAgICAgICAgImNlcnRpZmljYXRlX2hhc2giOiAiNDkwOTcxOGI0ZjlhOThiNWYzMzAxYzY4Y2VhYjc3NzZiYzJiY2Q0ZCIKICAgICAgICAgIH0KICAgICAgICB9LAogICAgICAgIHsKICAgICAgICAgICJjbGllbnRfaWQiOiAiOTE0NjMyMzkzMzEwLXY3ZjNlbTllc3V1N3I5ZzlpM3VyYm04ZmNscDZ1dGhtLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwKICAgICAgICAgICJjbGllbnRfdHlwZSI6IDMKICAgICAgICB9CiAgICAgIF0sCiAgICAgICJhcGlfa2V5IjogWwogICAgICAgIHsKICAgICAgICAgICJjdXJyZW50X2tleSI6ICJBSXphU3lCMC1VMkNET29CYWhCdnNiakJtcXpMUC1mQWNqRFBEdHMiCiAgICAgICAgfQogICAgICBdLAogICAgICAic2VydmljZXMiOiB7CiAgICAgICAgImFwcGludml0ZV9zZXJ2aWNlIjogewogICAgICAgICAgIm90aGVyX3BsYXRmb3JtX29hdXRoX2NsaWVudCI6IFsKICAgICAgICAgICAgewogICAgICAgICAgICAgICJjbGllbnRfaWQiOiAiOTE0NjMyMzkzMzEwLXY3ZjNlbTllc3V1N3I5ZzlpM3VyYm04ZmNscDZ1dGhtLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwKICAgICAgICAgICAgICAiY2xpZW50X3R5cGUiOiAzCiAgICAgICAgICAgIH0KICAgICAgICAgIF0KICAgICAgICB9CiAgICAgIH0KICAgIH0KICBdLAogICJjb25maWd1cmF0aW9uX3ZlcnNpb24iOiAiMSIKfQ==
           EOF
           fi
-          if [ -f "./debug.keystore" ]; then
+          if [ -f "./debug.keystore" ] && [ -s "./debug.keystore" ]; then
             echo "./debug.keystore already exists."
+          elif [ -f "./debug.keystore.base64" ] && [ -s "./debug.keystore.base64" ]; then
+            tr -d '\r\n ' < ./debug.keystore.base64 | base64 -d > ./debug.keystore
+            echo "Restored ./debug.keystore from ./debug.keystore.base64."
           else
-            "${JAVA_HOME}/bin/keytool" -genkeypair \
-              -v \
-              -keystore ./debug.keystore \
-              -storepass android \
-              -alias androiddebugkey \
-              -keypass android \
-              -keyalg RSA \
-              -keysize 2048 \
-              -validity 10000 \
-              -dname "CN=Android Debug,O=Android,C=US"
+            base64 -d << 'KS_EOF' > ./debug.keystore
+          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
+          KS_EOF
+            echo "Restored ./debug.keystore from embedded base64."
           fi
           if [ ! -f "./debug.keystore" ] || [ ! -s "./debug.keystore" ]; then
             echo "Error: ./debug.keystore could not be created." >&2
@@ -120,6 +117,35 @@ jobs:
 
       - name: Build debug APK
         run: gradle :app:assembleDebug --stacktrace --no-daemon
+
+      - name: Align and sign APK with v1, v2, and v3 schemes
+        run: |
+          EXPECTED_APK="app/build/outputs/apk/debug/app-debug.apk"
+          BUILD_TOOLS_DIR=""
+          for SDK_DIR in "${ANDROID_HOME:-}" "${ANDROID_SDK_ROOT:-}" "/usr/local/lib/android/sdk" "/opt/android/sdk"; do
+            if [ -n "${SDK_DIR}" ] && [ -d "${SDK_DIR}/build-tools" ]; then
+              LATEST_BT=$(ls -1d "${SDK_DIR}/build-tools/"* 2>/dev/null | sort -V | tail -n 1 || true)
+              if [ -n "${LATEST_BT}" ]; then
+                BUILD_TOOLS_DIR="${LATEST_BT}"
+                break
+              fi
+            fi
+          done
+          if [ -n "${BUILD_TOOLS_DIR}" ] && [ -x "${BUILD_TOOLS_DIR}/zipalign" ] && [ -x "${BUILD_TOOLS_DIR}/apksigner" ]; then
+            "${BUILD_TOOLS_DIR}/zipalign" -f -p 4 "${EXPECTED_APK}" "${EXPECTED_APK}.aligned"
+            mv -f "${EXPECTED_APK}.aligned" "${EXPECTED_APK}"
+            "${BUILD_TOOLS_DIR}/apksigner" sign \
+              --ks ./debug.keystore \
+              --ks-pass pass:android \
+              --key-pass pass:android \
+              --ks-key-alias androiddebugkey \
+              --min-sdk-version 21 \
+              --v1-signing-enabled true \
+              --v2-signing-enabled true \
+              --v3-signing-enabled true \
+              "${EXPECTED_APK}"
+            "${BUILD_TOOLS_DIR}/apksigner" verify --verbose --print-certs "${EXPECTED_APK}"
+          fi
 
       - name: Verify debug APK
         run: |
